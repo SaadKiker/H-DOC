@@ -1,0 +1,101 @@
+/* PatientEdit CSS overrides */
+
+/* Force exact same structure as Add Patient page */
+.dashboard-content.add-patient-page {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Make sure the form-content has the right layout */
+.add-patient-page .form-content {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  background-color: white;
+  height: calc(100vh - 72px);
+}
+
+/* Ensure navigation is properly styled */
+.add-patient-page .form-navigation {
+  padding-top: 0.5rem;
+}
+
+/* Header styling consistency with PatientCreation */
+.add-patient-page .page-header {
+  background-color: white;
+  border-bottom: none;
+  margin: 0;
+  max-width: none;
+  padding: 20px 24px;
+  height: 80px; /* Set a fixed height */
+}
+
+.add-patient-page .page-title {
+  color: #1E513B;
+  font-size: 1.75rem;
+  line-height: 1.2;
+  margin: 32px 0 0 0; /* Added top margin */
+}
+
+/* Add styling for page-header-content to ensure proper centering */
+.add-patient-page .page-header-content {
+  justify-content: center;
+  align-items: center;
+}
+
+/* Form styling consistency */
+.add-patient-page .form-section {
+  padding: 0;
+  border: none;
+}
+
+.add-patient-page .form-section:first-of-type {
+  margin-top: 0;
+  padding-top: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Add top padding to first form row in each section for separation from title */
+.add-patient-page .form-section .form-row:first-of-type {
+  padding-top: 1.5rem;
+}
+
+/* Match patient form spacing */
+.add-patient-page .patient-form {
+  max-width: 900px; /* Increased from 700px to make form sections wider */
+  margin: 0;
+  padding: 1.5rem 2.5rem;
+}
+
+/* Ensure the layout structure is correct */
+.add-patient-page .page-layout {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex;
+  flex-grow: 1;
+  width: 100%;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .add-patient-page .form-section {
+    padding: 0;
+  }
+  
+  /* Maintain top padding in mobile view for first form row */
+  .add-patient-page .form-section .form-row:first-of-type {
+    padding-top: 1.25rem;
+  }
+  
+  .add-patient-page .form-section:first-of-type {
+    padding-left: 0;
+    padding-right: 0;
+  }
+} 

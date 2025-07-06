@@ -1,0 +1,7353 @@
+/* Patient Profile Styles */
+
+/* Define a single transition for all animated elements */
+:root {
+  --transition-standard: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --speed-close: 0.3s;
+  --speed-open: 0.6s;
+}
+
+/* Admin label styles */
+.admin-label {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: rgba(220, 53, 69, 0.9);
+  color: white;
+  padding: 8px 15px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 9999;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+/* Main container */
+.patient-profile-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  transition: var(--transition-standard);
+  padding-top: 60px; /* Match exactly the header height with no extra space */
+}
+
+/* Header (Top Navigation Bar) */
+.profile-header {
+  height: 60px;
+  background-color: #1E513B;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0 0 24px; /* Left padding only */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: var(--transition-standard);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+}
+
+/* Make header shrink when notes panel is open */
+.notes-open .profile-header {
+  margin-right: 380px;
+}
+
+.patient-header-info {
+  display: flex;
+  align-items: center;
+  margin-left: 60px;
+}
+
+.patient-header-name {
+  font-size: 18px;
+  font-weight: 500;
+  margin-right: 10px;
+}
+
+.patient-header-details {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.male-text, .female-text {
+  color: white;
+}
+
+.active-visit-badge {
+  background-color: rgba(74, 222, 128, 0.2);
+  color: rgb(74, 222, 128);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  margin-left: 12px;
+  font-weight: 500;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  max-width: 120px;
+  overflow: hidden;
+  margin-left: 30px; /* Align with the dashboard logo */
+}
+
+.logo-image {
+  width: auto;
+  height: 20px;
+  max-width: 100%;
+}
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+  position: relative;
+  gap: 0;
+  height: 60px;
+  margin: 0;
+  padding: 0;
+}
+
+.patient-actions-dropdown {
+  position: relative;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+/* Hide three-dot menu for doctors */
+body[data-role="MEDECIN"] .patient-actions-dropdown {
+  display: none;
+}
+
+.menu-button {
+  background-color: transparent;
+  border: none;
+  width: 42px;
+  height: 60px;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+}
+
+/* Removed hover effect */
+
+.menu-button svg {
+  fill: white;
+  stroke: white;
+  stroke-width: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.patient-menu {
+  position: absolute;
+  top: 100%;
+  left: -160px;
+  width: 200px;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-top: 8px;
+  z-index: 100;
+  overflow: hidden;
+  color: #333;
+}
+
+.patient-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.patient-menu-item svg {
+  color: #666;
+}
+
+.patient-menu-item:hover {
+  background-color: #f5f5f5;
+}
+
+.patient-menu-item:first-child {
+  border-bottom: 1px solid #eee;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.icon-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.start-visit-button {
+  height: 60px;
+  border: none;
+  border-radius: 0;
+  background-color: #143c2b; /* Darker than the header color */
+  color: white;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 0 20px;
+  margin: 0;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.3s ease;
+}
+
+/* Makes sure the button stays visible during expanded panel transitions */
+.profile-header.forms-open.expanded-panel .start-visit-button {
+  transform: none;
+  opacity: 1;
+}
+
+.start-visit-button:hover {
+  background-color: #0d2a1d;
+}
+
+.close-button {
+  height: 60px;
+  width: 60px;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  position: relative;
+  /* Removed right offset */
+}
+
+.close-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* User menu */
+.user-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 220px;
+  background-color: rgb(255, 255, 255);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-top: 10px;
+  z-index: 100;
+  overflow: hidden;
+  color: #333;
+}
+
+.user-info {
+  padding: 16px;
+  background-color: #f5f5f5;
+}
+
+.user-name {
+  margin: 0 0 4px 0;
+  font-weight: 600;
+  font-size: 15px;
+  color: #333;
+}
+
+.user-role {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+  text-transform: capitalize;
+}
+
+.menu-divider {
+  margin: 0;
+  border: none;
+  border-top: 1px solid #eee;
+}
+
+.menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  color: #333;
+}
+
+.menu-item:hover {
+  background-color: #f5f5f5;
+}
+
+.menu-item.logout {
+  color: white;
+  background-color: #dc3545;
+  margin: 0;
+  border-radius: 0;
+  padding: 12px 16px;
+  font-weight: 500;
+}
+
+.menu-item.logout:hover {
+  background-color: #bd2130;
+}
+
+/* Main content area with sidebar */
+.profile-content {
+  display: flex;
+  flex: 1;
+  position: relative;
+  transition: var(--transition-standard);
+  min-height: calc(100vh - 60px); /* Account for header height */
+}
+
+.profile-content.notes-open {
+  margin-right: 380px;
+}
+
+.edit-mode-container {
+  width: 100%;
+  padding: 0 1rem;
+  background-color: #f5f5f5;
+}
+
+/* Sidebar */
+.profile-sidebar {
+  width: 240px;
+  background-color: white;
+  border-right: 1px solid #e0e0e0;
+  padding: 20px 0;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+  position: fixed;
+  top: 60px; /* Match the header height */
+  bottom: 0;
+  left: 0;
+  overflow-y: hidden;
+  z-index: 100;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  padding: 0 0px;
+}
+
+.nav-item {
+  display: flex;
+  width: 100%;
+  text-align: left;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #444;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  position: relative;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-item svg {
+  width: 18px;
+  height: 18px;
+  color: #444;
+  flex-shrink: 0;
+}
+
+.nav-item.active svg {
+  color: #1E513B;
+}
+
+.nav-item span {
+  flex: 1;
+  line-height: 1.2;
+  display: inline-block;
+}
+
+.nav-item:hover {
+  background-color: #f5f5f5;
+}
+
+.nav-item.active {
+  font-weight: 600;
+  color: #1E513B;
+  background-color: #f5f5f5;
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #1E513B;
+}
+
+.sidebar-action {
+  padding: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: transparent;
+  border: 1px solid #ddd;
+  padding: 8px 16px;
+  border-radius: 4px;
+  color: #555;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 14px;
+}
+
+.back-button:hover {
+  background-color: #f0f0f0;
+}
+
+/* Main content area */
+.profile-main {
+  flex: 1;
+  padding: 0 24px 24px 24px; /* Remove top padding */
+  margin-left: 240px; /* Same as sidebar width */
+  overflow-y: auto;
+}
+
+/* Add margin for agent users (compensate for missing VitalSignsHeader) */
+body:not([data-role="MEDECIN"]) .profile-main {
+  margin-top: 0; /* Removed the 24px top margin */
+}
+
+/* Patient header */
+.patient-header {
+  display: flex;
+  align-items: center;
+  margin: 0px -24px 24px -24px; /* Removed bottom margin */
+  background-color: #eaedf0;
+  padding: 20px 24px;
+  border-bottom: 1px solid #d0d5db;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.patient-avatar {
+  width: 64px;
+  height: 64px;
+  background-color: #1E513B;
+  color: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 26px;
+  margin-right: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.patient-title {
+  flex: 1;
+}
+
+.patient-title h1 {
+  margin: 0 0 8px 0;
+  font-size: 26px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #333;
+}
+
+.patient-gender {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  margin-left: 12px;
+}
+
+.patient-gender.male {
+  color: #0078d7;
+}
+
+.patient-gender.female {
+  color: #e91e63;
+}
+
+.patient-subtitle {
+  font-size: 15px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.patient-info-separator {
+  color: #ccc;
+  font-weight: 300;
+}
+
+.patient-ipp {
+  background-color: #eef1f5;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #444;
+  font-family: monospace;
+  letter-spacing: 0.5px;
+  border: 1px solid #d1d8e0;
+  font-weight: 600;
+}
+
+/* Patient resume tab */
+.patient-resume {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Vitals and biometrics tab */
+.patient-vitals {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-section {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.info-section:active {
+  transform: scale(0.99);
+}
+
+.info-section h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1E513B;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 8px;
+  position: relative;
+}
+
+.info-section p {
+  margin: 0 0 12px 0;
+  color: #555;
+  font-size: 15px;
+  padding: 6px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.info-section p:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.info-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 5px;
+}
+
+.info-column {
+  flex: 1;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.info-table {
+  display: table;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+
+.info-row-item {
+  display: table-row;
+}
+
+.info-icon, .info-key, .info-value-inline {
+  display: table-cell;
+  vertical-align: middle;
+  padding: 3px 0;
+}
+
+.info-icon {
+  width: 35px;
+  color: #1E513B;
+}
+
+.info-key {
+  width: 100px;
+  font-weight: 500;
+  color: #666;
+}
+
+.info-value-inline {
+  color: #333;
+  font-weight: 500;
+}
+
+.info-icon-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.info-icon-row svg {
+  color: #1E513B;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.mt-2 {
+  margin-top: 10px;
+}
+
+.info-label {
+  font-size: 12px;
+  color: #666;
+  margin: 0 0 3px 0;
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 14px;
+  color: #333;
+  margin: 0 0 4px 0;
+  padding: 0;
+  border: none;
+}
+
+.info-value:last-child {
+  margin-bottom: 0;
+}
+
+.info-value.empty-info {
+  color: #888;
+  font-style: italic;
+}
+
+.empty-contact {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.empty-info-text {
+  color: #888;
+  font-style: italic;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.info-grid-item {
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+@media (max-width: 768px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Documents tab */
+.patient-documents {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: none; /* Explicitly remove any border */
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1E513B;
+}
+
+.visit-count-badge {
+  background-color: #f5f5f5;
+  color: #555;
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.add-button {
+  background-color: #1E513B;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  position: relative;
+}
+
+.add-button:hover {
+  background-color: #16422F;
+}
+
+.exclamation-mark {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #e74c3c;
+  color: white;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #555;
+  text-align: center;
+  background-color: #f9fafb;
+  border-radius: 10px;
+  margin: 20px 0;
+  border: 1px dashed #ccd7e0;
+  min-height: 220px;
+}
+
+.empty-state p {
+  margin: 0 0 20px 0;
+  font-size: 16px;
+  color: #555;
+  font-weight: 500;
+}
+
+.documents-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.document-item {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.document-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.document-icon {
+  margin-right: 16px;
+  color: #1E513B;
+}
+
+.document-type-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+}
+
+.document-info {
+  flex: 1;
+}
+
+.document-info h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.document-info p {
+  margin: 0 0 8px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.document-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #888;
+}
+
+.document-type, .document-date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.document-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-button {
+  background-color: #f0f0f0;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.action-button:hover {
+  background-color: #e0e0e0;
+}
+
+.action-button.view {
+  color: #1E513B;
+}
+
+.action-button.view:hover {
+  background-color: rgba(30, 81, 59, 0.1);
+}
+
+.action-button.delete {
+  color: #dc3545;
+}
+
+.action-button.delete:hover {
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+/* Documents grid */
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-top: 24px;
+}
+
+@media (max-width: 768px) {
+  .documents-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .documents-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.document-card {
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.document-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+}
+
+.document-card:active {
+  transform: scale(0.98);
+}
+
+.document-thumbnail {
+  height: 180px;
+  background-color: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #e9ecef;
+  overflow: hidden;
+  position: relative;
+}
+
+.image-thumbnail {
+  background-color: #111;
+}
+
+.image-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.document-card:hover .image-thumbnail img {
+  transform: scale(1.05);
+}
+
+.pdf-thumbnail {
+  background-color: #fdedec;
+}
+
+.doc-thumbnail {
+  background-color: #e9f5fe;
+}
+
+.generic-thumbnail {
+  background-color: #f4f6f7;
+}
+
+.document-card-info {
+  padding: 18px;
+  background: linear-gradient(to bottom, #fff, #f9f9f9);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.document-card-title {
+  margin: 0 0 8px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.document-card-date {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.document-card-date:before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #1E513B;
+  opacity: 0.6;
+}
+
+/* Document Upload Modal styles */
+.document-upload-overlay {
+  z-index: 1300;
+}
+
+.document-upload-modal,
+.document-confirm-modal {
+  background-color: white;
+  border-radius: 8px;
+  width: 500px;
+  max-width: 95%;
+  max-height: 90vh;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: modalAppear 0.3s ease-out;
+}
+
+.document-confirm-modal {
+  width: 700px;
+}
+
+.upload-modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f9f9f9;
+}
+
+.upload-modal-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.upload-modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.file-upload-area {
+  padding: 30px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-input {
+  position: absolute;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+.file-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 200px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #f9f9f9;
+  color: #555;
+  padding: 20px;
+  text-align: center;
+}
+
+.file-upload-label:hover {
+  border-color: #1E513B;
+  background-color: #f2f8f5;
+}
+
+.file-upload-label.dragging {
+  border-color: #1E513B;
+  background-color: #e6f3ee;
+  transform: scale(1.02);
+  box-shadow: 0 0 8px rgba(30, 81, 59, 0.2);
+}
+
+.file-upload-label svg {
+  margin-bottom: 16px;
+  color: #1E513B;
+}
+
+.file-upload-label span {
+  margin: 8px 0;
+}
+
+.file-upload-label .file-types {
+  font-size: 12px;
+  color: #888;
+}
+
+.upload-modal-footer {
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  overflow: hidden;
+}
+
+.upload-modal-footer .cancel-button {
+  flex: 1;
+  background-color: #f5f5f5;
+  border: none;
+  color: #333;
+  padding: 16px 0;
+  margin: 0;
+  border-radius: 0;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.upload-modal-footer .cancel-button:hover {
+  background-color: #e0e0e0;
+}
+
+/* Confirmation modal specific styles */
+.confirm-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.confirm-content {
+  display: flex;
+  gap: 20px;
+}
+
+.file-preview {
+  flex: 1;
+  max-width: 40%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #f9f9f9;
+}
+
+.file-preview img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.generic-file-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+}
+
+.generic-file-preview p {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #666;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.document-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-size: 14px;
+  resize: none;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #1E513B;
+}
+
+/* Updated footer styling for equal width buttons */
+.confirm-modal-footer {
+  display: flex;
+  border-top: 1px solid #e0e0e0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  width: 100%;
+  gap: 0;
+}
+
+.confirm-modal-footer .cancel-button,
+.confirm-modal-footer .submit-btn {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  border-radius: 0;
+  padding: 16px 0;
+  font-size: 15px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+  text-align: center;
+  box-sizing: border-box;
+  width: 50%;
+}
+
+.confirm-modal-footer .cancel-button {
+  background-color: #f5f5f5;
+  color: #333;
+  border-right: 1px solid #e0e0e0;
+}
+
+.confirm-modal-footer .cancel-button:hover {
+  background-color: #e0e0e0;
+}
+
+.confirm-modal-footer .submit-btn {
+  background-color: #1E513B;
+  color: white;
+  font-weight: 500;
+}
+
+.confirm-modal-footer .submit-btn:hover {
+  background-color: #143c2b;
+}
+
+.confirm-modal-footer button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Document viewer modal styles */
+.document-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9); /* Darker background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1200;
+  backdrop-filter: blur(5px);
+}
+
+.document-close-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1210;
+  transition: background-color 0.2s;
+}
+
+.document-close-button:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.document-viewer-container {
+  width: 90%; /* Increased from 80% */
+  height: 85vh; /* Increased from 80vh */
+  display: flex;
+  background-color: #1a1a1a; /* Darker background */
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  animation: modalAppear 0.3s ease-out;
+  max-width: 1800px; /* Increased from 1600px */
+  position: relative; /* Ensure proper positioning context */
+}
+
+.document-preview-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 24px;
+  background-color: #222;
+  min-width: 0; /* Ensure flex item can shrink properly */
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.document-image-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background-color: #222;
+}
+
+.document-image-preview img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  display: block;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  transition: opacity 0.3s ease;
+}
+
+.document-loading-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  z-index: 5;
+}
+
+.document-loading-spinner p {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #cccccc;
+  font-weight: 500;
+}
+
+.image-controls {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 20px;
+  padding: 4px;
+}
+
+.zoom-button {
+  background: none;
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.zoom-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.document-pdf-preview,
+.document-doc-preview,
+.document-generic-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  background-color: #191919; /* Darker background */
+  z-index: 10; /* Ensure visibility */
+}
+
+.preview-note {
+  margin: 16px 0;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.view-original-button {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  margin-top: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  display: inline-flex;
+  align-items: center;
+}
+
+.view-original-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.document-info-sidebar {
+  width: 350px;
+  background-color: #2a2a2a;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.document-info-content {
+  padding: 30px 24px;
+  overflow-y: auto;
+  flex: 1;
+  background-color: transparent; /* Ensure background is transparent */
+}
+
+.document-title {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: white; /* Ensure title is white */
+}
+
+.document-description {
+  margin-bottom: 30px;
+  font-size: 14px;
+  color: #ddd;
+  line-height: 1.5;
+}
+
+.document-meta-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+}
+
+.meta-label {
+  color: #c0c0c0 !important; /* Changed from #aaa to a lighter gray for better readability */
+  margin-bottom: 2px;
+  font-weight: 400;
+}
+
+.meta-value {
+  color: white !important; /* Ensure values are white for maximum contrast */
+  font-weight: 500; /* Make values slightly bolder for better distinction */
+}
+
+.document-action-buttons {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: auto; /* Push to bottom when in flex container */
+}
+
+.document-download-button,
+.document-delete-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-decoration: none;
+  border: none;
+}
+
+.document-download-button {
+  background-color: #1E513B;
+  color: white;
+}
+
+.document-download-button:hover {
+  background-color: #143c2b;
+}
+
+.document-delete-button {
+  background-color: #a31515;
+  color: white;
+}
+
+.document-delete-button:hover {
+  background-color: #8a1212;
+}
+
+.action-button.end {
+  color: #1E513B;
+}
+
+.action-button.end:hover {
+  background-color: #e0f0e0;
+}
+
+.visit-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.icon-action-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+  color: #555;
+  font-size: 13px;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.icon-action-button:hover {
+  color: #1E513B;
+}
+
+.icon-action-button.delete {
+  color: #666;
+}
+
+.icon-action-button.delete:hover {
+  color: #dc3545;
+}
+
+.icon-action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: #999;
+}
+
+.icon-action-button:disabled:hover {
+  color: #999;
+}
+
+.visit-actions {
+  position: absolute;
+  bottom: 8px;
+  right: 15px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.visit-action-buttons.horizontal {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  justify-content: flex-end;
+}
+
+/* Three-dot menu styles */
+.row-menu-button {
+  background: none;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  z-index: 100;
+  color: #333;
+  transition: background-color 0.2s;
+  background-color: #f0f0f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.row-menu-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #1E513B;
+}
+
+.row-menu-popup {
+  position: absolute;
+  top: 65px;
+  right: 20px;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 150;
+  overflow: hidden;
+  min-width: 150px;
+  border: 1px solid #eee;
+}
+
+.row-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.row-menu-item:hover {
+  background-color: #f5f5f5;
+}
+
+.row-menu-item svg {
+  width: 16px;
+  height: 16px;
+  color: #666;
+}
+
+.link-button {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  font-size: 15px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
+  box-shadow: none !important;
+  white-space: nowrap;
+}
+
+.link-button.with-icon {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+  padding: 3px 6px !important;
+  background-color: transparent !important;
+  transition: all 0.2s;
+  justify-content: center;
+  font-size: 12px;
+  text-decoration: underline !important;
+}
+
+.link-button.edit {
+  color: #1E513B !important;
+}
+
+.link-button.edit:hover {
+  color: #1E513B !important;
+  text-decoration: underline;
+}
+
+.link-button.delete {
+  color: #dc3545 !important;
+}
+
+.link-button.delete:hover {
+  color: #dc3545 !important;
+  text-decoration: underline;
+}
+
+.link-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Visits tab */
+.patient-visits {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.visits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.visit-item {
+  display: flex;
+  align-items: stretch;
+  background-color: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  position: relative;
+}
+
+.visit-info.new-design {
+  padding: 20px;
+  width: 100%;
+}
+
+.visit-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.visit-type-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px; /* Reduced from 10px to make it more compact */
+}
+
+.visit-type-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.visit-type-label {
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #333;
+}
+
+.specialty-badge {
+  background-color: #e9f7ef;
+  color: #1E513B;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: inline-flex;
+  border: 1px solid rgba(30, 81, 59, 0.15);
+}
+
+.visit-dates-new {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 2px; /* Reduced from 5px to bring dates closer to visit type */
+}
+
+.decorative-line {
+  height: 8px;
+  width: 25px;
+  background-color: #1E513B; /* Standard dark green used throughout the app */
+  margin-top: 0px;
+  margin-bottom: 0px; /* Reduced from 14px to minimize gap */
+  border-radius: 0; /* Sharp edges with no rounding */
+}
+
+.date-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 3px; /* Reduced from 5px to bring label and value closer */
+}
+
+.date-item-separator {
+  display: inline-block;
+  width: 1px;
+  height: 16px;
+  background-color: transparent;
+  margin: 0 8px;
+}
+
+.date-item-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #000;
+}
+
+.date-item-value {
+  display: inline-block;
+  padding: 2px 4px; /* Reduced from 4px 8px to make it more compact */
+  border-radius: 0;
+  font-size: 13px;
+  font-weight: 400;
+  background-color: transparent;
+  border: none;
+  color: #555;
+}
+
+.date-item-value.start {
+  background-color: transparent;
+  color: #555;
+  border: none;
+}
+
+.date-item-value.end {
+  background-color: transparent;
+  color: #555;
+  border: none;
+}
+
+.visit-action-buttons-new {
+  display: flex;
+  gap: 15px;
+  background-color: white;
+}
+
+.action-button-new {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.action-button-new.edit {
+  color: #1E513B;
+}
+
+.action-button-new.edit:hover {
+  background-color: rgba(30, 81, 59, 0.1);
+}
+
+.action-button-new.delete {
+  color: #dc3545;
+}
+
+.action-button-new.delete:hover {
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.action-button-new svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Responsive design for new visit card */
+@media (max-width: 768px) {
+  .visit-header-top {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .visit-action-buttons-new {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  .visit-action-buttons-new {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .action-button-new {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.visit-status {
+  width: 80px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.visit-status::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.visit-status.active {
+  background-color: rgba(0, 151, 167, 0.08);
+  color: #0097a7;
+}
+
+.visit-status.active::before {
+  background-color: #0097a7;
+}
+
+.visit-status.completed {
+  background-color: rgba(56, 142, 60, 0.08);
+  color: #388e3c;
+}
+
+.visit-status.completed::before {
+  background-color: #388e3c;
+}
+
+.visit-info {
+  flex: 1;
+  padding: 26px 15px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Visit Header Row */
+.visit-header-row {
+  display: flex;
+  flex-direction: column;
+  border-bottom: none;
+  padding-bottom: 10px;
+  margin-bottom: 8px;
+  width: 100%;
+  padding-right: 140px;
+}
+
+.visit-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.visit-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #1E513B;
+}
+
+.visit-service {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.service-tag {
+  background-color: #e9f7ef;
+  color: #1E513B;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+  border: 1px solid rgba(30, 81, 59, 0.15);
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Visit Dates */
+.visit-dates-compact {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.date-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 2px 5px;
+  min-width: 90px;
+  z-index: 1;
+}
+
+.date-label {
+  font-size: 13px;
+  color: #000;
+  margin-bottom: 1px;
+  font-weight: 700;
+}
+
+.date-value {
+  font-size: 13px;
+  color: #555;
+  font-weight: 400;
+  background-color: transparent;
+  border: none;
+}
+
+.start-date {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.end-date {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+/* Visit Content Row */
+.visit-content-row {
+  display: block;
+}
+
+.visit-reason {
+  display: inline;
+}
+
+.reason-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  margin: 0 8px 0 0;
+}
+
+.vertical-separator {
+  display: inline-block;
+  width: 1px;
+  height: 68px;
+  background-color: transparent;
+  margin: 0 35px;
+  vertical-align: middle;
+}
+
+.reason-text {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.4;
+  display: inline;
+  font-style: italic;
+}
+
+/* Doctor Section */
+.visit-doctor-section {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.visit-doctor-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: transparent;
+  padding: 0;
+}
+
+.doctor-avatar {
+  background-color: #1E513B;
+  color: white;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.doctor-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.doctor-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.doctor-specialty {
+  font-size: 11px;
+  color: #1E513B;
+  background-color: #e8f5e9;
+  padding: 2px 6px;
+  border-radius: 3px;
+  display: inline-block;
+  max-width: fit-content;
+}
+
+/* Loading States */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+.skeleton-text {
+  height: 15px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.visit-doctor-card.loading {
+  opacity: 0.7;
+}
+
+.visit-doctor-card.empty {
+  background-color: #f5f5f5;
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.no-doctor-message {
+  color: #888;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* Visit Header (Original) */
+.visit-header {
+  cursor: pointer;
+  padding: 5px 0;
+}
+
+.dropdown-button {
+  background: none;
+  border: none;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #666;
+}
+
+.visit-details {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #e0e0e0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .visit-item {
+    flex-direction: column;
+  }
+  
+  .visit-status {
+    width: 100%;
+    padding: 6px 0;
+    border-bottom: none;
+  }
+  
+  .visit-status::before {
+    width: 100%;
+    height: 3px;
+    top: 0;
+  }
+  
+  .visit-dates-compact {
+    position: static;
+    margin-top: 8px;
+    width: 100%;
+  }
+  
+  .date-badge {
+    flex: 1;
+  }
+  
+  .visit-info {
+    padding: 12px 15px;
+    flex: 1;
+  }
+  
+  .visit-content-row {
+    flex-direction: column;
+  }
+  
+  .visit-reason {
+    flex: 1;
+    width: auto;
+  }
+  
+  .visit-doctor-section {
+    width: 100%;
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .visit-doctor-card {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .visit-title-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .visit-doctor-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .reason-label, .reason-text {
+    display: block;
+    margin: 5px 0 0 0;
+  }
+  
+  .vertical-separator {
+    display: none;
+  }
+  
+  .visit-header-row {
+    padding-right: 0;
+  }
+  
+  .visit-actions {
+    position: static;
+    border-top: none;
+    padding: 10px;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .visit-action-buttons.horizontal {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+/* Loading state */
+.loading-spinner:not(.consultations-tab .loading-spinner):not(.medications-tab .loading-spinner) {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(30, 81, 59, 0.2);
+  border-radius: 50%;
+  border-top-color: #1E513B;
+  animation: spin 1s ease infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error/Not Found state */
+.patient-not-found {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+/* Sliding Panel for Start Visit */
+.sliding-panel {
+  position: fixed;
+  top: 60px; /* Match the height of the profile-header */
+  right: 0; /* We'll use transform instead of right property */
+  width: 450px;
+  height: calc(100vh - 60px); /* Subtract header height from full viewport height */
+  background-color: #fff;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.15);
+  z-index: 1050; /* Higher than overlay */
+  overflow-y: auto;
+  transform: translateX(100%); /* Start position off-screen */
+  transition: transform 0.3s ease; /* Smooth transition */
+}
+
+/* Apply transform when open */
+.sliding-panel.open {
+  transform: translateX(0);
+}
+
+.sliding-panel-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sliding-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0; /* Keeping just this border for visual separation */
+}
+
+.sliding-panel-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.close-panel-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  color: #555;
+  transition: background-color 0.2s;
+  border-radius: 50%;
+}
+
+.close-panel-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.visit-form {
+  padding: 15px 20px 0 20px; /* Added left/right padding for consistent spacing */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-section {
+  margin-bottom: 24px; /* Maintain spacing between sections */
+  padding: 0 0 20px 0;
+  border-bottom: none; /* Explicitly remove border */
+}
+
+.form-section:last-child {
+  border-bottom: none; /* Explicitly set to none for the last child too */
+  margin-bottom: 0;
+}
+
+.form-section .section-header {
+  padding: 0 0 12px 0; /* Remove horizontal padding, keep bottom padding */
+  background-color: transparent; /* Remove background color */
+  border-bottom: none; /* Remove bottom border */
+  display: flex;
+  flex-direction: column; /* Stack title and description vertically */
+  align-items: flex-start; /* Explicitly align items to the left */
+  text-align: left; /* Ensure text is left-aligned */
+  margin-bottom: 16px; /* Add some space between header and content */
+}
+
+.form-section .section-header h4 {
+  font-size: 22px; /* Increased from 20px to make titles more prominent */
+  color: #cccccc; /* Changed from #1E513B to blue */
+  margin: 0 0 5px 0;
+  font-weight: 600;
+  position: relative; /* For positioning the underline */
+  display: inline-block; /* To make the underline width match the text */
+  padding-bottom: 8px; /* Space for the underline */
+  text-align: left; /* Ensure header text is left-aligned */
+}
+
+.section-content {
+  padding: 0; /* Remove padding since we're removing the container */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.form-group {
+  flex: 1;
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #555;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="time"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background-color: #f5f5f5;
+}
+
+.input-with-icon {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+}
+
+.search-input {
+  padding-left: 36px !important;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23888888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>');
+  background-repeat: no-repeat;
+  background-position: 12px center;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
+
+.radio-option input[type="radio"] {
+  width: 18px;
+  height: 18px;
+}
+
+.radio-label {
+  font-weight: 500;
+}
+
+.assign-doctor-button {
+  background-color: transparent;
+  border: 1px solid #1E513B;
+  color: #1E513B;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.assign-doctor-button:hover {
+  background-color: rgba(30, 81, 59, 0.05);
+}
+
+.no-results {
+  color: #888;
+  font-style: italic;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+/* Form actions and buttons - updated to match appointment form */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 20px 20px 20px 0; /* Right padding to prevent buttons from touching the edge */
+  background-color: transparent;
+  border-top: 1px solid #e0e0e0;
+}
+
+.cancel-button, 
+.submit-button {
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 100px;
+  text-align: center;
+}
+
+.cancel-button {
+  background-color: white;
+  border: 1px solid #ddd;
+  color: #666;
+}
+
+.cancel-button:hover {
+  background-color: #f5f5f5;
+}
+
+.submit-button {
+  background-color: #1E513B;
+  border: 1px solid #1E513B;
+  color: white;
+  min-width: 140px;
+}
+
+.submit-button:hover {
+  background-color: #174430;
+}
+
+.submit-button:disabled,
+.cancel-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Extremely high z-index to ensure it's on top of everything */
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 0;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: modalAppear 0.3s ease-out;
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-header {
+  padding: 24px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.modal-title svg {
+  color: #f59e0b; /* Warning color */
+}
+
+.modal-title h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.close-modal-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #555;
+  display: flex;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.close-modal-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-body p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #444;
+}
+
+.modal-footer {
+  display: flex;
+  padding: 0;
+  margin: 0;
+  background-color: #f5f5f5;
+  border-top: 1px solid #e0e0e0;
+  width: 100%;
+  overflow: hidden;
+}
+.modal-footer .cancel-btn,
+.modal-footer .submit-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+  border-radius: 0;
+  padding: 18px 0;
+  font-size: 15px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+  text-align: center;
+}
+.modal-footer .cancel-btn {
+  background-color: #f5f5f5;
+  color: #333;
+  border-right: 1px solid #e0e0e0;
+}
+.modal-footer .cancel-btn:hover {
+  background-color: #e0e0e0;
+}
+.modal-footer .submit-btn {
+  background-color: #1E513B;
+  color: white;
+  font-weight: 500;
+}
+.modal-footer .submit-btn:hover {
+  background-color: #143c2b;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .profile-content {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .profile-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .sidebar-nav {
+    display: flex;
+    overflow-x: auto;
+    padding: 0;
+  }
+  
+  .nav-item {
+    padding: 12px 16px;
+    white-space: nowrap;
+  }
+  
+  .nav-item.active::before {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    height: 4px;
+  }
+  
+  .sidebar-action {
+    display: none;
+  }
+  
+  .info-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .patient-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .patient-avatar {
+    margin-bottom: 16px;
+  }
+  
+  .sliding-panel {
+    width: 100%;
+    right: -100%;
+  }
+}
+/* No doctors message */
+.no-doctors-message {
+  padding: 30px 0;
+  text-align: center;
+  color: #666;
+  font-size: 15px;
+}
+/* Doctor item styling */
+.doctor-item {
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-left: 4px solid transparent;
+}
+
+.doctor-item:hover {
+  background-color: #f8f9fa;
+}
+
+.doctor-item.selected {
+  background-color: #e8f5e9;
+  border-left: 4px solid #1E513B;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.doctor-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.doctor-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #333;
+  font-size: 15px;
+}
+
+.doctor-specialty {
+  font-size: 13px;
+  color: #666;
+  background-color: #f0f0f0;
+  padding: 3px 8px;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.doctor-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: #1E513B;
+  color: white;
+  border-radius: 50%;
+  font-weight: 600;
+  font-size: 16px;
+  margin-right: 15px;
+}
+
+.doctor-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.doctor-item.unavailable {
+  opacity: 0.7;
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.doctor-item.unavailable .doctor-badge {
+  background-color: #999;
+}
+
+.doctor-item.unavailable:hover {
+  background-color: #f5f5f5;
+}
+
+.doctor-status {
+  margin-left: 15px;
+  font-size: 12px;
+  color: #d32f2f;
+  background-color: #ffebee;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+/* Specialty filter styling */
+.specialty-filter {
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f0f7f4;
+}
+
+.specialty-filter select {
+  width: 100%;
+  padding: 14px 18px;
+  border: 1px solid #c8e6d7;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #333;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231E513B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 15px;
+  transition: all 0.2s;
+}
+
+.specialty-filter select:focus {
+  outline: none;
+  border-color: #1E513B;
+  box-shadow: 0 0 0 3px rgba(30, 81, 59, 0.2);
+}
+/* Section header styling */
+.section-header {
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  background-color: transparent;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.section-header::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 20px;
+  width: 50px;
+  height: 3px;
+  background-color: #1E513B;
+  display: none !important; /* Hide this line to prevent duplication */
+  border-radius: 2px;
+}
+/* Selected doctor styling */
+.selected-doctor-info {
+  padding: 16px;
+  background-color: #f0f7f4;
+  border: 1px solid #c8e6d7;
+  border-radius: 8px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.selected-doctor-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #1E513B;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 18px;
+  margin-right: 16px;
+}
+
+.selected-doctor-details {
+  flex: 1;
+}
+
+.selected-doctor-info .doctor-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #1E513B;
+  font-size: 16px;
+}
+
+.selected-doctor-info .doctor-specialty {
+  font-size: 14px;
+  color: #555;
+  background-color: #dbeee5;
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 15px;
+  margin-bottom: 12px;
+}
+/* Container to align the button right */
+.button-container {
+  text-align: right;
+}
+
+/* Doctor buttons styling */
+.change-doctor-button {
+  background-color: #e8f5e9;
+  color: #1E513B;
+  border: 1px solid #1E513B;
+  padding: 8px 16px;
+  border-radius: 6px;
+  margin-top: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+}
+
+.change-doctor-button:hover {
+  background-color: #1E513B;
+  color: white;
+}
+
+.change-doctor-button::before {
+  content: "↻";
+  margin-right: 6px;
+  font-size: 14px;
+}
+
+.assign-doctor-button {
+  background-color: #1E513B;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.assign-doctor-button:hover {
+  background-color: #143c2b;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.assign-doctor-button::before {
+  content: "+";
+  margin-right: 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+/* Doctor list updates */
+.doctors-list-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid #e0e0e0;
+}
+
+.doctor-assignment-modal .modal-body {
+  padding: 0;
+  margin: 0;
+}
+.doctors-section {
+  padding: 0;
+  margin: 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.doctors-section:last-child {
+  border-bottom: none;
+}
+/* Doctor name display in visits list */
+.doctor-name-display {
+  display: inline-block;
+  color: #1E513B;
+  font-weight: 500;
+}
+/* Animation for doctor name when it updates */
+@keyframes highlight-update {
+  0% {
+    background-color: rgba(30, 81, 59, 0.2);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.updated-name {
+  animation: highlight-update 2s ease-out;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+/* Doctor info in visit list */
+.visit-doctor-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.visit-doctor-info strong {
+  white-space: nowrap;
+}
+/* Doctor specialty tag */
+.doctor-specialty-tag {
+  font-size: 11px;
+  background-color: #f0f7f4;
+  color: #1E513B;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 8px;
+  white-space: nowrap;
+  border: 1px solid #c8e6d7;
+}
+
+.refreshing-doctor {
+  color: #999;
+  font-style: italic;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Sliding Panel Overlay - adds a dimming effect when panels are open */
+.sliding-panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1045;
+  display: none;
+  transition: var(--transition-standard);
+  pointer-events: auto;
+}
+
+.sliding-panel-overlay.visible {
+  display: block;
+}
+
+/* Notes button and vertical actions */
+.notes-button, .forms-button {
+  transition: var(--transition-standard);
+  position: relative;
+  overflow: visible;
+}
+
+/* Vertical actions column buttons */
+.vertical-actions-column button {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #cccccc;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  transition: var(--transition-standard);
+  position: relative;
+}
+
+/* Special styling for both buttons */
+.vertical-actions-column .notes-button,
+.vertical-actions-column .forms-button {
+  position: relative;
+  overflow: visible;
+  opacity: 1;
+  transform: scale(1);
+  transition: var(--transition-standard), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 56px; /* Same size for both buttons */
+  height: 56px; /* Same size for both buttons */
+  background-color: #1E513B; /* Updated to the new color */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(255, 255, 255, 0.1); /* Enhanced shadow for more depth */
+}
+
+/* Hide notes button when notes panel is open */
+.notes-open .vertical-actions-column .notes-button {
+  /* Removed hiding properties to keep button visible */
+}
+
+/* When notes panel closes, make button reappear slightly larger */
+.vertical-actions-column .notes-button.reappear {
+  width: 64px; /* Larger on reappear */
+  height: 64px; /* Larger on reappear */
+}
+
+/* Pulsing animation effect for the pen button */
+.vertical-actions-column .notes-button::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #1E513B; /* Match the button color */
+  opacity: 0.5; /* Slightly more opaque for better visibility */
+  z-index: -1;
+  animation: pulse-animation 2s infinite;
+}
+
+/* Hover state for notes button specifically */
+.vertical-actions-column .notes-button:hover {
+  background: #003a3e; /* Darker shade on hover */
+  transform: translateY(-3px); /* Slightly more lift on hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35), 0 0 0 3px rgba(255, 255, 255, 0.15); /* Enhanced hover effect */
+  color: white;
+}
+
+/* Ensure pen icon is white and larger size */
+.vertical-actions-column .notes-button svg {
+  width: 20px; /* Fixed size icon */
+  height: 20px; /* Fixed size icon */
+  color: white;
+  fill: white;
+  stroke: white;
+  position: relative; /* Ensure proper stacking */
+  z-index: 2; /* Make sure it's above other elements */
+  min-width: 20px; /* Prevent icon from shrinking */
+  min-height: 20px; /* Prevent icon from shrinking */
+}
+
+/* Active/pressed state for notes button */
+.vertical-actions-column .notes-button:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25), 0 0 0 2px rgba(255, 255, 255, 0.1);
+  background-color: #002f33; /* Darker shade when pressed */
+}
+
+/* Increase the pulse size to match the larger button */
+@keyframes pulse-animation {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+    box-shadow: 0 0 0 0 rgba(0, 71, 77, 0.5);
+  }
+  50% {
+    transform: scale(1.35); /* Larger pulse ratio */
+    opacity: 0;
+    box-shadow: 0 0 0 15px rgba(0, 71, 77, 0);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+    box-shadow: 0 0 0 0 rgba(0, 71, 77, 0);
+  }
+}
+
+/* Notes panel */
+.notes-panel {
+  position: fixed;
+  top: 60px; /* Match the height of profile-header */
+  right: 0;
+  width: 25%; /* Use percentage instead of fixed width */
+  height: calc(100vh - 60px); /* Subtract header height from full viewport height */
+  background-color: white;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
+  border-left: 2px solid #1E513B; /* Add a distinct border for visual separation */
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%); /* Start fully off-screen */
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* Improved animation curve */
+  will-change: transform;
+  pointer-events: auto; /* Make sure it's interactive */
+}
+
+/* Opening slower with smoother easing */
+.notes-panel.open {
+  transform: translateX(0); /* Slide in */
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); /* Slower opening */
+}
+
+/* Main content shift when notes panel is open */
+.profile-content.notes-open {
+  margin-right: 25%; /* Match the notes panel width */
+  max-width: 75%; /* 100% - panel width */
+  transition: margin-right 0.6s cubic-bezier(0.16, 1, 0.3, 1), max-width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  width: auto; /* Allow content to adjust width */
+}
+
+/* Notes panel header shift - remove margin to keep header in place */
+.notes-open .profile-header {
+  margin-right: 0; /* No shifting of header */
+  transition: margin-right 0.3s ease;
+}
+
+/* Notes panel vertical actions column movement */
+.notes-open .vertical-actions-column {
+  right: calc(25% + 20px); /* Panel width + some spacing */
+}
+
+/* Forms panel */
+.forms-panel {
+  position: fixed;
+  top: 60px; /* Match the height of the profile-header */
+  right: 0;
+  width: 25%; /* Use percentage instead of fixed width */
+  height: calc(100vh - 60px); /* Subtract header height from full viewport height */
+  background-color: white;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
+  border-left: 0; /* Remove border to avoid extra space */
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%); /* Start fully off-screen */
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* Improved animation curve */
+  will-change: transform, width;
+  pointer-events: auto; /* Make sure it's interactive */
+}
+
+/* Opening slower with smoother easing */
+.forms-panel.open {
+  transform: translateX(0); /* Slide in */
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); /* Slower opening */
+}
+
+/* Expanded panel when form is selected */
+.forms-panel.expanded {
+  width: 50%; /* Exactly 50% width as per requirement */
+  max-width: none; /* Remove max-width constraint to ensure it's exactly 50% */
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* When both forms and notes are open (though this shouldn't happen in practice) */
+.profile-content.forms-open.notes-open {
+  margin-right: 25%; /* Use percentage-based width */
+}
+
+/* Main content shift when forms panel is open */
+.profile-content.forms-open {
+  margin-right: 25%; /* Match the regular panel width */
+  max-width: 75%; /* 100% - panel width */
+  transition: margin-right 0.6s cubic-bezier(0.16, 1, 0.3, 1), max-width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Header should NOT shift when forms panel is open - remove the margin-right */
+.profile-header.forms-open {
+  margin-right: 0; /* No shift for header */
+  transition: margin-right 0.3s ease;
+}
+
+/* Header should NOT shift when forms panel is expanded */
+.profile-header.forms-open.expanded-panel {
+  margin-right: 0; /* No shift for header */
+  max-width: 100%; /* Keep header at full width */
+  transition: margin-right 0.3s ease, max-width 0.3s ease;
+}
+
+/* Make the profile content adapt to expanded panel with smooth transition */
+.profile-content.forms-open.expanded-panel {
+  margin-right: 50%; /* Exactly 50% to match the expanded panel width */
+  max-width: 50%; /* Exactly 50% to ensure content takes remaining space */
+  padding-right: 0; /* Remove any padding that might create a gap */
+  transition: margin-right 0.6s cubic-bezier(0.16, 1, 0.3, 1), max-width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Vertical actions column movement */
+.forms-open .vertical-actions-column {
+  right: calc(25% + 20px); /* Panel width + some spacing */
+}
+
+/* Move vertical actions column when forms panel is expanded */
+.forms-open.expanded-panel .vertical-actions-column {
+  right: calc(50% + 20px); /* Changed from 45% to 50% to match the expanded panel width */
+}
+
+.forms-panel-header {
+  height: 60px; /* Match profile-header height */
+  padding: 0 20px; /* Adjust padding */
+  background-color: #cccccc;
+  color: black;
+  display: flex;
+  align-items: center; /* Center vertically */
+  justify-content: space-between; /* Add this to position title and close button */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add same shadow as profile-header */
+  position: relative; /* For positioning the close button */
+}
+
+.forms-panel-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Badge indicating mock data is being used */
+.mock-data-badge {
+  font-size: 12px;
+  padding: 2px 6px;
+  background-color: #f39c12;
+  color: #fff;
+  border-radius: 4px;
+  margin-left: 8px;
+  font-weight: 400;
+  vertical-align: middle;
+}
+
+.forms-panel-content {
+  flex: 1;
+  padding: 0px;
+  overflow-y: auto;
+}
+
+.forms-panel-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.forms-panel-footer button {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.forms-panel-footer .cancel-btn {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  color: #333;
+}
+
+/* Ensure form icon is white and proper size */
+.vertical-actions-column .forms-button svg {
+  width: 20px; /* Fixed size icon */
+  height: 20px; /* Fixed size icon */
+  color: white;
+  fill: white;
+  stroke: white;
+  position: relative; /* Ensure proper stacking */
+  z-index: 2; /* Make sure it's above other elements */
+  min-width: 20px; /* Prevent icon from shrinking */
+  min-height: 20px; /* Prevent icon from shrinking */
+}
+
+/* Hover state for forms button specifically */
+.vertical-actions-column .forms-button:hover {
+  background: #003a3e; /* Darker version of new color on hover */
+  transform: translateY(-3px); /* Slightly more lift on hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35), 0 0 0 3px rgba(255, 255, 255, 0.15); /* Enhanced hover effect */
+  color: white;
+}
+
+/* Active/pressed state for forms button */
+.vertical-actions-column .forms-button:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25), 0 0 0 2px rgba(255, 255, 255, 0.1);
+  background-color: #002f33; /* Darker version of new color when pressed */
+}
+
+/* Hide forms button when forms panel is open */
+.forms-open .vertical-actions-column .forms-button {
+  /* Removed hiding properties to keep button visible */
+}
+
+/* When forms panel closes, make button reappear slightly larger */
+.vertical-actions-column .forms-button.reappear {
+  width: 64px; /* Larger on reappear */
+  height: 64px; /* Larger on reappear */
+}
+
+/* Pulsing animation effect for the form button */
+.vertical-actions-column .forms-button::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #1E513B;/* Match the button color */
+  opacity: 0.5; /* Slightly more opaque for better visibility */
+  z-index: -1;
+  animation: pulse-animation 2s infinite;
+}
+
+/* Hide forms button when forms panel is open - REMOVED */
+/* Instead, style the button differently when panel is open */
+.vertical-actions-column .forms-button.panel-open,
+.vertical-actions-column .notes-button.panel-open {
+  opacity: 0.7;
+  background-color: #002f33; /* Darker version of new color when panel is open */
+  cursor: default;
+  transform: scale(0.9); /* Slightly smaller */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Style for disabled buttons */
+.vertical-actions-column button:disabled {
+  opacity: 0.6;
+  cursor: default;
+  pointer-events: none;
+  background-color: #40686c; /* Lighter version of new color for disabled state */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Remove the animations and state changes that hide buttons */
+.forms-open .vertical-actions-column .forms-button,
+.notes-open .vertical-actions-column .notes-button {
+  /* Reset the properties that were hiding the buttons */
+  opacity: 1;
+  transform: scale(0.9);
+  pointer-events: none;
+}
+
+/* Style for inactive notes button */
+.vertical-actions-column .notes-button.inactive {
+  opacity: 0.5;
+  background-color: #40686c; /* Lighter version of new color when inactive */
+  cursor: not-allowed;
+}
+
+/* Fixed Action Buttons Container */
+.fixed-action-buttons {
+  position: fixed;
+  right: 60px;
+  top: 90px; /* Position just below the header */
+  display: flex;
+  flex-direction: row; /* Side by side buttons */
+  gap: 32px; /* Gap between buttons */
+  z-index: 9999; /* Ensure buttons are always on top */
+}
+
+/* Hidden state for fixed action buttons */
+.fixed-action-buttons.hidden {
+  display: none;
+}
+
+/* Common styles for action buttons */
+.fixed-action-buttons button {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #1E513B;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  position: relative; /* Ensure positioning for pseudo elements */
+}
+
+/* Specific style for certificate button to ensure consistency */
+.certificate-button {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+/* Icons inside buttons */
+.fixed-action-buttons button svg {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  color: white;
+  fill: white;
+  stroke: white;
+  position: relative;
+  z-index: 2;
+}
+
+/* Hover state for buttons */
+.fixed-action-buttons button:hover:not(:disabled) {
+  background: #003a3e;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35), 0 0 0 3px rgba(255, 255, 255, 0.15);
+}
+
+/* Active/pressed state for buttons */
+.fixed-action-buttons button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25), 0 0 0 2px rgba(255, 255, 255, 0.1);
+  background-color: #002f33;
+}
+
+/* Disabled state for buttons */
+.fixed-action-buttons button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #40686c;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Animation for all buttons */
+.fixed-action-buttons button::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #1E513B;
+  opacity: 0.5;
+  z-index: -1;
+  animation: pulse-animation 2s infinite;
+  /* This animation applies to all buttons in the fixed-action-buttons container,
+     including notes-button, forms-button and certificate-button */
+}
+
+/* Specific styles for certificate button to ensure proper animation */
+.certificate-button::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #1E513B;
+  opacity: 0.5;
+  z-index: -1;
+  animation: pulse-animation 2s infinite;
+}
+
+/* Content shift when forms and notes panels are open */
+.forms-open .fixed-action-buttons,
+.notes-open .fixed-action-buttons,
+.prescription-panel-open .fixed-action-buttons {
+  /* Remove right positioning since we're hiding buttons completely */
+}
+
+/* Transition for button position */
+.fixed-action-buttons {
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Hide both buttons when either panel is open */
+.forms-open .fixed-action-buttons,
+.notes-open .fixed-action-buttons,
+.prescription-panel-open .fixed-action-buttons {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* Transition for button visibility */
+.fixed-action-buttons {
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Hide both buttons when either panel is open */
+.forms-open .fixed-action-buttons,
+.notes-open .fixed-action-buttons,
+.prescription-panel-open .fixed-action-buttons {
+  display: none;
+}
+
+/* Remove transition */
+.fixed-action-buttons {
+  /* No transition */
+}
+
+/* Panel close button - unified styling for both Notes and Forms panels */
+.panel-close-button {
+  height: 60px;
+  width: 60px;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 10;
+  cursor: pointer;
+  color: #1E513B;
+  border: none;
+}
+
+.panel-close-button:hover {
+  background-color: transparent; /* Keep the same background color as the panel header */
+}
+
+.panel-close-button svg {
+  width: 20px;
+  height: 20px;
+  color: #1E513B;
+  fill: #1E513B;
+  stroke: #1E513B;
+}
+
+/* Forms panel custom styles */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  color: #666;
+}
+
+.error-state {
+  padding: 20px;
+  background-color: #fff3f3;
+  border-left: 4px solid #f44336;
+  margin: 20px 0;
+  border-radius: 4px;
+}
+
+.error-state p {
+  margin-bottom: 15px;
+  color: #d32f2f;
+}
+
+.retry-button {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.retry-button:hover {
+  background-color: #e0e0e0;
+}
+
+.form-templates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-template-item {
+  padding: 16px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 15px;
+  background-color: #F3F9F6; /* Changed from #f9f9f9 to light green tone */
+  border-radius: 8px;
+  border-left: 4px solid #1E513B;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.form-template-item:hover {
+  background-color: #E6F3EE; /* Changed from #f0f0f0 to slightly darker shade of light green */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-template-item h4 {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #1E513B; /* Changed from #333 to the requested dark green */
+}
+
+.form-template-item p {
+  margin: 0;
+  font-size: 14px;
+  color: #5f6d64; /* Changed from #666 to the requested subtle gray */
+}
+
+.form-structure {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-structure-header {
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.back-to-list-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #1E513B;
+  padding: 8px 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.back-to-list-button:hover {
+  text-decoration: underline;
+}
+
+.form-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-section {
+  margin-bottom: 25px;
+  padding: 0 0 25px 0;
+  border-bottom: none; /* Remove the border to avoid second horizontal line */
+}
+
+.form-section:last-child {
+  border-bottom: none; /* Explicitly set to none for the last child too */
+  margin-bottom: 0;
+}
+
+.form-section .section-header {
+  padding: 0 0 12px 0; /* Remove horizontal padding, keep bottom padding */
+  background-color: transparent; /* Remove background color */
+  border-bottom: none; /* Remove bottom border */
+  display: flex;
+  flex-direction: column; /* Stack title and description vertically */
+  align-items: flex-start; /* Explicitly align items to the left */
+  text-align: left; /* Ensure text is left-aligned */
+  margin-bottom: 16px; /* Add some space between header and content */
+}
+
+.form-section .section-header h4 {
+  font-size: 22px; /* Increased from 20px to make titles more prominent */
+  color: #1E513B; /* Changed from #1E513B to blue */
+  margin: 0 0 5px 0;
+  font-weight: 600;
+  position: relative; /* For positioning the underline */
+  display: inline-block; /* To make the underline width match the text */
+  padding-bottom: 8px; /* Space for the underline */
+  text-align: left; /* Ensure header text is left-aligned */
+}
+
+.section-content {
+  padding: 0; /* Remove padding since we're removing the container */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-field label {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.form-field .required {
+  color: #ff0000;
+  margin-left: 4px;
+  font-weight: 600;
+}
+
+.form-field .unit {
+  color: #666;
+  font-size: 13px;
+  font-weight: normal;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background-color: #f9f9f9;
+}
+
+.form-field input:disabled,
+.form-field select:disabled,
+.form-field textarea:disabled {
+  background-color: #f9f9f9;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.form-field textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.form-field select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: #666;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+/* Notes panel also with percentage width for consistency */
+.notes-panel {
+  position: fixed;
+  top: 60px; /* Match the height of profile-header */
+  right: 0;
+  width: 25%; /* Use percentage instead of fixed width */
+  height: calc(100vh - 60px); /* Subtract header height from full viewport height */
+  background-color: white;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
+  border-left: 2px solid #1E513B; /* Add a distinct border for visual separation */
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%); /* Start fully off-screen */
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* Improved animation curve */
+  will-change: transform;
+  pointer-events: auto; /* Make sure it's interactive */
+}
+
+/* Opening slower with smoother easing */
+.notes-panel.open {
+  transform: translateX(0);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); /* Slower opening */
+}
+
+/* Main content shift when notes panel is open */
+.profile-content.notes-open {
+  margin-right: 25%; /* Match the notes panel width */
+  max-width: 75%; /* 100% - panel width */
+  transition: margin-right 0.6s cubic-bezier(0.16, 1, 0.3, 1), max-width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  width: auto; /* Allow content to adjust width */
+}
+
+/* Notes panel header shift - remove margin to keep header in place */
+.notes-open .profile-header {
+  margin-right: 0; /* No shifting of header */
+  transition: margin-right 0.3s ease;
+}
+
+/* Notes panel vertical actions column movement */
+.notes-open .vertical-actions-column {
+  right: calc(25% + 20px); /* Panel width + some spacing */
+}
+
+/* Notes panel header */
+.notes-panel-header {
+  height: 60px; /* Match profile-header height */
+  padding: 0 20px; /* Adjust padding */
+  background-color: #cccccc;
+  color: Black;
+  display: flex;
+  align-items: center; /* Center vertically */
+  justify-content: space-between; /* Add this to position title and close button */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add same shadow as profile-header */
+  position: relative; /* For positioning the close button */
+}
+
+.notes-panel-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.notes-panel-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.notes-textarea {
+  width: 100%;
+  height: calc(100vh - 240px); /* Adjusted from 180px to account for the panel starting 60px from the top */
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: none;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.notes-panel-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.notes-panel-footer button {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.notes-panel-footer .cancel-btn {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  color: #333;
+}
+
+.notes-panel-footer .save-btn {
+  background-color: #1E513B;
+  border: 1px solid #1E513B;
+  color: white;
+}
+
+/* Main content transition */
+.profile-content {
+  transition: var(--transition-standard);
+}
+
+/* Vertical Actions Column */
+.vertical-actions-column {
+  position: fixed;
+  right: 60px; /* Increased from 20px to add more margin from the edge */
+  top: 120px; /* Adjusted to be closer to the header */
+  display: flex;
+  flex-direction: row; /* Changed to row for horizontal alignment */
+  gap: 32px; /* Gap between buttons */
+  z-index: 1000; /* Increased z-index to appear above vital signs header */
+  transition: var(--transition-standard);
+  will-change: right;
+}
+
+/* Active/pressed state for notes button */
+.vertical-actions-column .notes-button:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25), 0 0 0 2px rgba(255, 255, 255, 0.1);
+  background-color: #002f33; /* Darker shade when pressed */
+}
+
+/* New styles for form content wrapper with two columns */
+.form-content-wrapper {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Left column for section navigation */
+.form-sections-navigation {
+  width: 30%;
+  border-right: 1px solid #e0e0e0;
+  overflow-y: auto;
+  background-color: #f8f8f8;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Back to list button in navigation */
+.form-nav-header {
+  padding: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.back-to-list-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #555;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.back-to-list-button:hover {
+  background-color: #f8f8f8;
+  color: #1E513B; /* Changed from #1E513B to blue */
+}
+
+.back-to-list-button svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+/* Sections list in left navigation */
+.form-sections-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 0;
+}
+
+.form-sections-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.form-sections-list li {
+  padding: 12px 15px;
+  cursor: pointer;
+  position: relative;
+  font-size: 14px;
+  color: #444;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.form-sections-list li:hover {
+  background-color: #ebebeb;
+  color: #1E513B; /* Changed from #1E513B to blue */
+}
+
+.form-sections-list li.active {
+  background-color: #e5f1ee;
+  color: #1E513B; /* Changed from #1E513B to blue */
+  border-left-color: #1E513B; /* Changed from #1E513B to blue */
+  font-weight: 500;
+}
+
+/* Right column for form fields */
+.form-fields-container {
+  width: 70%;
+  padding: 20px;
+  overflow-y: auto;
+  height: 100%;
+}
+
+/* Success message after form submission */
+.success-state {
+  padding: 20px;
+  background-color: #e6f7ee;
+  border-left: 4px solid #2ecc71;
+  margin: 20px 0;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.success-state p {
+  color: #27ae60;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Form submit button */
+.forms-panel-footer .submit-btn {
+  padding: 10px 20px;
+  background-color: #1E513B; /* Changed from #1E513B to blue */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.forms-panel-footer .submit-btn:hover:not(:disabled) {
+  background-color: #002f33; /* Changed hover color to darker blue */
+}
+
+.forms-panel-footer .submit-btn:disabled {
+  background-color: #6a8e91; /* Updated disabled color to match blue theme */
+  cursor: not-allowed;
+}
+
+/* Make form fields more interactive */
+.form-field input:not(:disabled),
+.form-field select:not(:disabled),
+.form-field textarea:not(:disabled) {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: #1E513B; /* Changed from #1E513B to blue */
+  box-shadow: 0 0 0 2px rgba(0, 71, 77, 0.2); /* Changed from rgba(30, 81, 59, 0.2) to match blue */
+}
+
+.form-field input:hover:not(:disabled):not(:focus),
+.form-field select:hover:not(:disabled):not(:focus),
+.form-field textarea:hover:not(:disabled):not(:focus) {
+  border-color: #aaa;
+}
+
+/* Required field styling */
+.form-field .required {
+  color: #ff0000;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* Better spacing between sections */
+.form-section {
+  margin-bottom: 25px;
+  padding: 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 25px;
+}
+
+.form-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.form-section .section-header {
+  margin-bottom: 15px;
+  padding-bottom: 0;
+  border-bottom: none; /* Remove existing border */
+  position: relative; /* Allow for absolute positioning of pseudo-element */
+}
+
+.form-section .section-header h4 {
+  font-size: 22px; /* Increased from 20px to make titles more prominent */
+  color: #1E513B; /* Changed from #1E513B to blue */
+  margin: 0 0 5px 0;
+  font-weight: 600;
+  position: relative; /* For positioning the underline */
+  display: inline-block; /* To make the underline width match the text */
+  padding-bottom: 8px; /* Space for the underline */
+  text-align: left; /* Ensure header text is left-aligned */
+}
+
+/* Add the underline as a pseudo-element */
+.form-section .section-header h4::after {
+  content: '';
+  position: absolute;
+  left: 0; /* Align with the left edge of the title */
+  bottom: 0;
+  height: 2px;
+  width: 40px; /* Fixed width for the underline */
+  background-color: #1E513B; /* Changed from #1E513B to blue */
+}
+
+.form-section .section-description {
+  margin: 8px 0 0 0; /* Increased top margin for better spacing */
+  font-size: 14px;
+  color: #666;
+  font-weight: normal;
+  line-height: 1.4;
+  text-align: left; /* Ensure description text is left-aligned */
+  width: 100%; /* Full width to maintain alignment */
+}
+
+.nested-sections {
+  margin-top: 8px;
+  margin-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .form-content-wrapper {
+    flex-direction: column;
+  }
+  
+  .form-sections-navigation {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .form-fields-container {
+    width: 100%;
+  }
+}
+
+/* New styles for form fields */
+.checkbox-field {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+  align-items: flex-start; /* Align checkboxes to the left */
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%; /* Take full width of the container */
+  justify-content: flex-start; /* Align checkbox options to the left */
+}
+
+.checkbox-field input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.checkbox-label {
+  margin: 0;
+  font-weight: normal;
+}
+
+.radio-field {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 5px;
+  align-items: flex-start; /* Align radio buttons to the left */
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%; /* Take full width of the container */
+  justify-content: flex-start; /* Align radio options to the left */
+}
+
+/* Restoring font-size and cursor for checkbox and radio labels */
+.checkbox-label, .radio-label {
+  margin: 0;
+  font-weight: normal;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.radio-option input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #1E513B;
+}
+
+.radio-label {
+  margin: 0;
+  font-weight: normal;
+}
+
+.range-field {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.range-field input[type="range"] {
+  width: 100%;
+  cursor: pointer;
+}
+
+.range-value {
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+}
+
+/* Style for inputs of various types */
+.form-field input[type="color"] {
+  padding: 0;
+  width: 50px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.form-field input[type="file"] {
+  padding: 8px 0;
+  width: 100%;
+  cursor: pointer;
+}
+
+.form-field input[type="email"],
+.form-field input[type="tel"],
+.form-field input[type="url"],
+.form-field input[type="password"] {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: #1E513B; /* Changed from #1E513B to blue */
+  box-shadow: 0 0 0 2px rgba(0, 71, 77, 0.2); /* Changed from rgba(30, 81, 59, 0.2) to match blue */
+}
+
+/* Styles for unsupported field type */
+.unsupported-field-type input {
+  border: 1px solid #ffcc00;
+  background-color: #fffaed;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #555;
+}
+
+.unsupported-field-type input:focus {
+  outline: none;
+  border-color: #ffcc00;
+  box-shadow: 0 0 0 2px rgba(255, 204, 0, 0.2);
+}
+
+/* Form sections navigation and sidebar */
+.form-sections-navigation {
+  width: 250px;
+  min-width: 250px;
+  border-right: 1px solid #e0e0e0;
+  overflow-y: auto;
+  background-color: #f8f8f8;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Form sections buttons within the sections list */
+.form-sections-buttons {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Sidebar button styling */
+.sidebar-btn {
+  padding: 12px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+/* Button order - Enregistrer on top, Annuler below */
+.sidebar-btn.submit-btn {
+  background-color: #1E513B; /* Match the app's color scheme */
+  border: none;
+  color: white;
+}
+
+.sidebar-btn.submit-btn:hover:not(:disabled) {
+  background-color: #002f33;
+}
+
+.sidebar-btn.pdf-btn {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  margin-top: 10px;
+}
+
+.sidebar-btn.pdf-btn:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.sidebar-btn.cancel-btn {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  color: #333;
+  margin-top: 10px;
+}
+
+.btn-with-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-with-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.sidebar-btn.cancel-btn:hover:not(:disabled) {
+  background-color: #e9e9e9;
+}
+
+.sidebar-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-nav-header {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+/* New styles for medical form components */
+
+/* Number input with unit display */
+.number-input-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.number-input-container input[type="number"] {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background-color: #f9f9f9;
+  /* Remove default number spinner arrows in some browsers */
+  -moz-appearance: textfield;
+}
+
+/* Hide arrow buttons on number inputs for Chrome/Safari/Edge */
+.number-input-container input[type="number"]::-webkit-outer-spin-button,
+.number-input-container input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.unit-display {
+  color: #666;
+  font-size: 14px;
+  min-width: 30px;
+  text-align: left;
+}
+
+/* Checkbox styles for multi-select */
+.checkbox-field {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 5px;
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox-option input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #1E513B;
+}
+
+.checkbox-label {
+  margin: 0;
+  font-weight: normal;
+}
+
+/* Radio button styling */
+.radio-field {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 5px;
+  align-items: flex-start; /* Align radio buttons to the left */
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%; /* Take full width of the container */
+  justify-content: flex-start; /* Align radio options to the left */
+}
+
+.radio-option input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #1E513B;
+}
+
+.radio-label {
+  margin: 0;
+  font-weight: normal;
+}
+
+/* Searchable dropdown */
+.searchable-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.searchable-dropdown input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background-color: #f9f9f9;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3ccircle cx='11' cy='11' r='8'%3e%3c/circle%3e%3cline x1='21' y1='21' x2='16.65' y2='16.65'%3e%3c/line%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+/* Search field */
+.search-field {
+  position: relative;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 12px;
+  padding-right: 40px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background-color: #f9f9f9;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3ccircle cx='11' cy='11' r='8'%3e%3c/circle%3e%3cline x1='21' y1='21' x2='16.65' y2='16.65'%3e%3c/line%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+}
+
+/* Date field */
+.date-field {
+  position: relative;
+  width: 100%;
+}
+
+.date-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background-color: #f9f9f9;
+}
+
+/* Unsupported field warning */
+.unsupported-field-type {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.field-type-warning {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+/* Select container */
+.select-container {
+  position: relative;
+  width: 100%;
+}
+
+.select-container select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background-color: #f9f9f9;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+/* Focus styles for all form elements */
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus,
+.date-input:focus {
+  outline: none;
+  border-color: transparent;
+  box-shadow: 0 0 0 2px rgba(30, 81, 59, 0.2);
+}
+
+/* Hover styles */
+.form-field input:hover:not(:focus):not(:disabled),
+.form-field select:hover:not(:focus):not(:disabled),
+.form-field textarea:hover:not(:focus):not(:disabled),
+.date-input:hover:not(:focus):not(:disabled) {
+  border-color: #aaa;
+}
+
+/* Validation error styling */
+.validation-error {
+  border-color: #e74c3c !important;
+  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.3) !important;
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+  background-color: #fff8f8 !important;
+}
+
+.field-error-message {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.field-error-message::before {
+  content: '⚠️';
+  margin-right: 4px;
+  font-size: 12px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* ... existing code ... */
+
+/* Document edit form */
+.document-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  padding: 10px 0;
+}
+
+.document-edit-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.document-edit-form label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #ffffff;
+  margin-bottom: 2px;
+}
+
+/* Input fields with white background and black text */
+.document-edit-form input,
+.document-edit-form textarea,
+.document-edit-form select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 6px;
+  border: 1px solid #cccccc;
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 14px;
+  resize: vertical;
+  transition: all 0.2s ease;
+}
+
+.document-edit-form textarea {
+  min-height: 100px;
+}
+
+/* Keep white background even when focused */
+.document-edit-form input:focus,
+.document-edit-form textarea:focus,
+.document-edit-form select:focus {
+  outline: none;
+  border-color: #2c7a5c;
+  box-shadow: 0 0 0 2px rgba(30, 81, 59, 0.3);
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Make sure dropdown arrows and other elements are visible */
+.document-edit-form select {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 8px 10px;
+  padding-right: 30px;
+}
+
+.document-edit-form .form-actions {
+  display: flex;
+  justify-content: flex-end; /* Changed from flex-start to flex-end to align buttons to the right */
+  gap: 12px;
+  margin-top: 20px;
+  background-color: transparent; /* Make background transparent */
+}
+
+.document-viewer-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: auto;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  justify-content: flex-start;
+}
+
+.action-button svg {
+  flex-shrink: 0;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+  background-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.action-button.edit {
+  background-color: rgba(30, 81, 59, 0.3);
+}
+
+.action-button.edit:hover {
+  background-color: rgba(30, 81, 59, 0.5);
+}
+
+.action-button.replace {
+  background-color: rgba(52, 152, 219, 0.3);
+}
+
+.action-button.replace:hover {
+  background-color: rgba(52, 152, 219, 0.5);
+}
+
+.action-button.download {
+  background-color: rgba(41, 128, 185, 0.3);
+}
+
+.action-button.download:hover {
+  background-color: rgba(41, 128, 185, 0.5);
+}
+
+.action-button.delete {
+  background-color: rgba(231, 76, 60, 0.3);
+  color: white;
+}
+
+.action-button.delete:hover {
+  background-color: rgba(231, 76, 60, 0.5);
+  color: white;
+}
+
+.action-button.save {
+  background-color: rgba(46, 204, 113, 0.8);
+  font-weight: 600;
+}
+
+.action-button.save:hover {
+  background-color: rgba(46, 204, 113, 1);
+}
+
+.action-button.cancel {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.action-button.cancel:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.file-upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+}
+
+.selected-file-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.selected-file-info span {
+  word-break: break-all;
+  font-size: 14px;
+  color: #e0e0e0;
+  font-weight: 500;
+}
+
+.file-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.action-button.upload {
+  background-color: rgba(52, 152, 219, 0.4);
+  justify-content: center;
+}
+
+.action-button.upload:hover {
+  background-color: rgba(52, 152, 219, 0.6);
+}
+
+.action-button.confirm {
+  background-color: rgba(46, 204, 113, 0.7);
+  font-weight: 600;
+  padding: 10px 14px;
+}
+
+.action-button.confirm:hover {
+  background-color: rgba(46, 204, 113, 0.9);
+}
+
+/* Improve document info display */
+.document-title {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 12px;
+}
+
+.document-description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #e0e0e0;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: pre-line;
+}
+
+.document-meta-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.meta-label {
+  min-width: 80px;
+  font-size: 14px;
+  color: #aaa;
+  font-weight: 500;
+}
+
+.meta-value {
+  font-size: 14px;
+  color: #fff;
+  font-weight: 500;
+}
+
+/* Specific styles for document edit form section labels */
+.document-edit-form .form-group label[for="document-title"],
+.document-edit-form .form-group label[for="document-description"],
+.document-edit-form .form-group label[for="document-type"] {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+/* Form headings: Titre, Description, etc. */
+.document-info-sidebar .document-edit-form h2,
+.document-info-sidebar .form-title {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* Form label colors */
+.document-edit-form label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #ffffff;
+  margin-bottom: 2px;
+}
+
+/* Form titles in the modal */
+.document-info-content h2.document-title {
+  color: #ffffff;
+}
+
+/* Add subtle text shadows to improve readability on dark backgrounds */
+.document-info-sidebar label,
+.document-info-sidebar h2,
+.document-info-sidebar .meta-label,
+.document-info-sidebar .meta-value {
+  text-shadow: none;
+}
+
+.document-info-sidebar .meta-label {
+  color: #c0c0c0 !important; /* Light gray for labels */
+  font-weight: 400;
+}
+
+.document-info-sidebar .meta-value {
+  color: white !important; /* Pure white for values */
+  font-weight: 500;
+}
+
+/* Vital Signs and Biometrics Page */
+.vital-signs-container {
+  padding: 24px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.vital-signs-container h2 {
+  margin-bottom: 24px;
+  color: var(--color-text-dark);
+  font-size: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 12px;
+}
+
+.biometric-data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.biometric-section {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.biometric-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.biometric-section h3 {
+  background-color: var(--color-primary);
+  color: white;
+  padding: 12px 16px;
+  margin: 0;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.biometric-section-content {
+  padding: 16px;
+}
+
+.biometric-field {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.biometric-field:last-child {
+  border-bottom: none;
+}
+
+.field-name {
+  color: var(--color-text-dark);
+  font-weight: 500;
+}
+
+.field-value {
+  font-weight: 600;
+  color: var(--color-secondary);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.empty-state p {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--color-text-dark);
+  margin-bottom: 8px;
+}
+
+.empty-state small {
+  color: var(--color-text-light);
+}
+
+/* VitalSignsBiometrics component styles */
+.add-data-button {
+  background-color: var(--color-primary, #1E513B);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px auto;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.add-data-button::before {
+  content: "+";
+  margin-right: 8px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.add-data-button:hover {
+  background-color: var(--color-primary-dark, #174631);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.add-data-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 0;
+  color: #666;
+  text-align: center;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.empty-state p {
+  margin: 16px 0;
+  font-size: 16px;
+  color: #555;
+}
+
+/* Vital Signs & Biometrics Styles */
+.vital-signs-container {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.vital-signs-container .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.vital-signs-container h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.add-data-button {
+  background-color: #1E513B;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.add-data-button:hover {
+  background-color: #143c2b;
+}
+
+.biometric-data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.biometric-section {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eaeaea;
+  transition: all 0.2s ease;
+}
+
+.biometric-section:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.biometric-section h3 {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 10px 0;
+  font-weight: 500;
+}
+
+.biometric-field {
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.field-value {
+  font-size: 18px;
+  color: #333;
+  font-weight: 600;
+}
+
+.vital-signs-tables {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.info-section {
+  border: 1px solid #eaeaea;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.info-section h3 {
+  background-color: #f5f5f5;
+  padding: 12px 16px;
+  margin: -16px -16px 16px -16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.info-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  background-color: #f5f5f5;
+  text-align: left;
+  padding: 12px 16px;
+  font-weight: 600;
+  color: #555;
+  font-size: 14px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.data-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eaeaea;
+  color: #333;
+  font-size: 14px;
+}
+
+.data-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.data-table tbody tr:hover {
+  background-color: #f0f0f0;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.empty-state p {
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.retry-button {
+  background-color: #1E513B;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.retry-button:hover {
+  background-color: #143c2b;
+}
+
+.error-state {
+  background-color: #fff8f8;
+  border: 1px solid #ffb6b6;
+  border-radius: 6px;
+  padding: 20px;
+  margin: 20px 0;
+  color: #d32f2f;
+}
+
+@media (max-width: 768px) {
+  .biometric-data-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  .vital-signs-container .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .add-data-button {
+    margin-top: 12px;
+  }
+}
+
+/* Vital Signs Header component styles - updated to match patient header */
+.vital-signs-header-container {
+  background-color: #1E513B0F; /* Same greenish tint as patient header */
+  padding: 10px 24px; /* Reduced top padding from 15px to 10px */
+  margin: -24px -24px 35px -24px; /* Added negative top margin to reduce space */
+  border-bottom: 1px solid rgba(30, 81, 59, 0.2);
+}
+
+.vital-signs-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px; /* Reduced from 15px to 10px */
+}
+
+.vital-signs-section-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1E513B;
+}
+
+.vital-signs-content {
+  width: 100%;
+}
+
+.vital-signs-metrics-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 9px 0 9px 20px; /* Reduced from 12px to 9px (25% reduction) */
+  row-gap: 15px; /* Reduced from 20px (25% reduction) */
+  column-gap: 10px;
+  margin-left: 15px;
+  width: calc(100% - 30px);
+}
+
+.vital-sign-inline-item {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 calc(24% - 20px);
+  min-width: 130px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(30, 81, 59, 0.2);
+  background-color: rgba(30, 81, 59, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-right: 0;
+  height: auto;
+  justify-content: center; /* Center content vertically */
+  align-items: center; /* Center content horizontally */
+}
+
+.vital-sign-inline-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: rgba(30, 81, 59, 0.08);
+}
+
+.vital-sign-label {
+  font-size: 11px;
+  color: #1E513B;
+  font-weight: 600;
+  margin-bottom: 2px;
+  text-align: center;
+  white-space: normal;
+  line-height: 1.2;
+  height: auto;
+  word-break: break-word;
+  width: 100%; /* Ensure the label takes full width */
+}
+
+.vital-sign-value-inline {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  width: 100%; /* Ensure the value container takes full width */
+}
+
+.vital-sign-number {
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+  text-align: center; /* Ensure text is centered */
+}
+
+.vital-sign-unit {
+  font-size: 13px;
+  color: #666;
+  margin-left: 2px;
+  font-weight: 400;
+}
+
+.add-vitals-button {
+  background-color: transparent;
+  color: #1E513B;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  white-space: nowrap;
+  text-decoration: underline;
+}
+
+.add-vitals-button:hover {
+  background-color: transparent;
+}
+
+.error-state {
+  background-color: #fff8f8;
+  border: 1px solid #ffb6b6;
+  border-radius: 6px;
+  padding: 15px;
+  color: #d32f2f;
+  max-width: 400px;
+  text-align: center;
+}
+
+.retry-button {
+  background-color: #1E513B;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.no-vitals-message {
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.loading-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60px;
+}
+
+/* Media query for responsive layout when side panel is open or screen is smaller */
+@media screen and (max-width: 1200px) {
+  .vital-signs-metrics-row {
+    justify-content: space-between;
+    row-gap: 20px; /* Reduced from 25px */
+    padding: 12px 20px;
+    margin-left: 0;
+    width: 100%; /* Full width at this breakpoint */
+  }
+  
+  /* Each inline item will take up approximately 25% of the row width */
+  .vital-sign-inline-item {
+    flex: 0 0 calc(24% - 10px); /* Adjusted to fit 4 items per row with spacing */
+    margin-right: 0; /* Let justify-content handle spacing */
+    min-height: 75px; /* Add minimum height to accommodate wrapping text */
+  }
+  
+  /* Ensure first 4 metrics are on the first line */
+  .vital-sign-inline-item:nth-child(-n+4) {
+    order: 0; /* Place first 4 items before others */
+  }
+  
+  /* Ensure next 4 metrics are on the second line */
+  .vital-sign-inline-item:nth-child(n+5) {
+    order: 1; /* Place next 4 items after the first 4 */
+  }
+}
+
+/* Media query for smaller screens/mobile */
+@media screen and (max-width: 768px) {
+  .vital-signs-metrics-row {
+    justify-content: space-between;
+    padding: 12px;
+    row-gap: 20px;
+  }
+  
+  .vital-sign-inline-item {
+    flex: 0 0 calc(48% - 8px); /* Adjusted for better spacing */
+    margin-right: 0;
+    padding: 6px; /* Reduced from 8px (25% reduction) */
+    min-height: 52px; /* Reduced from 70px (25% reduction) */
+  }
+  
+  .vital-signs-header-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .add-vitals-button {
+    margin-top: 10px;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Retain some of the original styles but with modifications */
+.vital-signs-header {
+  /* This style block is kept for backwards compatibility */
+  display: none;
+}
+
+/* ... existing code continues ... */
+
+/* Hide the Température metric specifically */
+.vital-sign-inline-item[key="temperature"] {
+  display: none !important;
+}
+
+/* Enhanced validation styling for select elements */
+select.validation-error {
+  border-color: #e74c3c !important;
+  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.3) !important;
+  background-color: #fff8f8 !important;
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Add a placeholder style for empty selects that need validation */
+select.validation-error option:first-child {
+  color: #e74c3c;
+  font-weight: 500;
+}
+
+/* Add a red dropdown arrow for validation errors */
+select.validation-error {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e74c3c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+/* Certificate Modal Styles */
+.duration-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.duration-input-container input {
+  flex: 1;
+  padding-right: 50px; /* Make space for the unit */
+  width: 100%;
+}
+
+.duration-unit {
+  position: absolute;
+  right: 12px;
+  color: #777;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+/* Updated footer styling for equal width buttons */
+.confirm-modal-footer {
+  display: flex;
+  border-top: 1px solid #e0e0e0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  width: 100%;
+  gap: 0;
+}
+
+.confirm-modal-footer .cancel-button,
+.confirm-modal-footer .submit-btn {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  border-radius: 0;
+  padding: 16px 0;
+  font-size: 15px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+  text-align: center;
+  box-sizing: border-box;
+  width: 50%;
+}
+
+.confirm-modal-footer .cancel-button {
+  background-color: #f5f5f5;
+  color: #333;
+  border-right: 1px solid #e0e0e0;
+}
+
+.confirm-modal-footer .cancel-button:hover {
+  background-color: #e0e0e0;
+}
+
+.confirm-modal-footer .submit-btn {
+  background-color: #1E513B;
+  color: white;
+  font-weight: 500;
+}
+
+.confirm-modal-footer .submit-btn:hover {
+  background-color: #143c2b;
+}
+
+.confirm-modal-footer button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* End Certificate Modal Styles */
+
+/* Sliding panel - common styles */
+.sliding-panel {
+  position: fixed;
+  top: 60px; /* Match the height of the profile-header */
+  right: 0; /* We'll use transform instead of right property */
+  width: 450px;
+  height: calc(100vh - 60px); /* Subtract header height from full viewport height */
+  background-color: #fff;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.15);
+  z-index: 1050; /* Higher than overlay */
+  overflow-y: auto;
+  transform: translateX(100%); /* Start position off-screen */
+  transition: transform 0.3s ease; /* Smooth transition */
+}
+
+/* Apply transform when open */
+.sliding-panel.open {
+  transform: translateX(0);
+}
+
+/* Prescription panel specific styles */
+.prescription-panel-open .profile-content {
+  width: calc(100% - 27%);
+  transition: width 0.3s ease;
+}
+
+/* Main content container styling */
+.profile-content {
+  width: 100%;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+}
+
+/* Prescription panel styling */
+.prescription-panel {
+  position: fixed;
+  top: 60px;
+  right: 0;
+  width: 27%;
+  height: calc(100vh - 60px);
+  background-color: white;
+  z-index: 999;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
+  border-left: 2px solid #1E513B;
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+  transform: translateX(100%);
+}
+
+.prescription-panel.open {
+  transform: translateX(0);
+}
+
+.prescription-panel-header {
+  padding: 0 20px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #bbbbbb;
+  height: 60px;
+}
+
+.prescription-panel-header h3 {
+  margin: 0;
+  color: #000;
+  font-weight: 500;
+  font-size: 18px;
+}
+
+.prescription-panel-content {
+  padding: 20px;
+  overflow-y: auto;
+  height: calc(100% - 60px);
+}
+
+/* Prescription Panel Styles - add after existing prescription panel styles */
+.prescription-panel-content {
+  padding: 20px;
+  overflow-y: auto;
+  height: calc(100% - 60px);
+}
+
+/* Medication Search Styles */
+.medication-search {
+  margin-bottom: 20px;
+}
+
+.search-input-container {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.medication-search-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.medication-search-input:focus {
+  border-color: #1E513B;
+  box-shadow: 0 0 0 2px rgba(30, 81, 59, 0.1);
+}
+
+.search-spinner {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(30, 81, 59, 0.1);
+  border-radius: 50%;
+  border-top-color: #1E513B;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Create a smoother spin animation */
+@keyframes spin {
+  0% { transform: translateY(-50%) rotate(0deg); }
+  100% { transform: translateY(-50%) rotate(360deg); }
+}
+
+.medication-search-results {
+  max-height: calc(100vh - 300px);
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.medication-result-item {
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s ease;
+}
+
+.medication-result-item:last-child {
+  border-bottom: none;
+}
+
+.medication-result-item:hover {
+  background-color: #f9f9f9;
+}
+
+/* Medication header with name and button on same line */
+.medication-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.medication-result-item h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.medication-result-item p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Prescribe button styling with important flags */
+.prescribe-button {
+  background: none !important;
+  border: none;
+  padding: 0;
+  font-size: 14px;
+  color: #1E513B;
+  text-decoration: underline;
+  cursor: pointer;
+  text-align: right;
+  font-weight: 500;
+  position: relative; /* Add position relative */
+  z-index: 1; /* Give it a higher z-index */
+}
+
+.prescribe-button:hover {
+  color: #1E513B;
+  background: none !important;
+  background-color: transparent !important;
+  /* Add more specific rule to override any inherited backgrounds */
+  box-shadow: none !important;
+}
+
+/* Create a pseudo-element to prevent hover background change */
+.prescribe-button::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  background-color: transparent;
+  z-index: -1;
+}
+
+.prescribe-button:hover::before {
+  background-color: transparent !important;
+}
+
+.no-results-message {
+  padding: 16px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-radius: 4px;
+  color: #b91c1c;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+/* Prescription Form Panel Styles */
+.prescription-form-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.prescription-form-panel.open {
+  transform: translateX(0);
+}
+
+.prescription-form-header {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid #e0e0e0;
+  height: 60px;
+  background-color: #e0e0e0;
+  color: black;
+}
+
+.back-to-search-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #000;
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  padding: 0;
+  transition: color 0.2s ease;
+  height: 60px;
+  width: 50px;
+  justify-content: center;
+}
+
+.back-to-search-button:hover {
+  background-color: transparent;
+}
+
+.prescription-form-header h3 {
+  margin: 0;
+  flex: 1;
+  font-size: 18px;
+  font-weight: 500;
+  color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 0;
+}
+
+.prescription-form-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.prescription-medication-info {
+  margin-bottom: 28px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border-left: 4px solid #1E513B;
+}
+
+.prescription-medication-info h4 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.prescription-medication-info p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.prescription-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.prescription-form .form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+/* Make fields in form rows equal width */
+.prescription-form .form-row .form-group {
+  flex: 1 1 0; /* flex-grow, flex-shrink, flex-basis: 0 to make items equal width */
+  min-width: 0; /* Allow fields to shrink if needed */
+}
+
+.prescription-form .form-group {
+  margin-bottom: 0;
+}
+
+.prescription-form .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.prescription-form .form-group input,
+.prescription-form .form-group select,
+.prescription-form .form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #333;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.prescription-form .form-group input:focus,
+.prescription-form .form-group select:focus,
+.prescription-form .form-group textarea:focus {
+  outline: none;
+  border-color: #1E513B;
+  box-shadow: 0 0 0 2px rgba(30, 81, 59, 0.1);
+}
+
+.prescription-form .form-group input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.prescription-form .form-group input[type="number"]::-webkit-inner-spin-button,
+.prescription-form .form-group input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.prescription-form .form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.prescription-form-footer {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 16px 24px;
+  border-top: 1px solid #eee;
+  background-color: #fff;
+}
+
+.prescription-form-footer .cancel-button,
+.prescription-form-footer .submit-btn {
+  flex: 1;
+  min-width: 150px;
+  max-width: 200px;
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: center;
+}
+
+.prescription-form-footer .cancel-button {
+  background-color: #f5f5f5;
+  color: #333;
+  border: none;
+}
+
+.prescription-form-footer .cancel-button:hover {
+  background-color: #e5e5e5;
+}
+
+.prescription-form-footer .submit-btn {
+  background-color: #1E513B;
+  color: white;
+  border: none;
+}
+
+.prescription-form-footer .submit-btn:hover {
+  background-color: #143c2b;
+}
+
+/* Ensure the prescription form panel is visible when open */
+.prescription-panel.open .prescription-form-panel {
+  display: flex;
+}
+
+/* Profile content transition */
+.profile-content {
+  transition: margin-right 0.6s cubic-bezier(0.16, 1, 0.3, 1), max-width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Existing Prescriptions List Styles */
+.existing-prescriptions {
+  margin-bottom: 24px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 20px;
+}
+
+.existing-prescriptions h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px 0;
+}
+
+.prescriptions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.prescription-item {
+  background-color: #f0f0f0; /* Darker grey background */
+  border-radius: 8px;
+  border-left: 4px solid #1E513B;
+  padding: 10px 16px 10px 16px; /* Consistent padding on all sides */
+  padding-right: 16px; /* Added explicit right padding to ensure space for trash icon */
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  cursor: pointer;
+}
+
+.prescription-item:hover {
+  background-color: #e8e8e8; /* Even darker grey when hovering */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.prescription-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px; /* Reduced margin */
+}
+
+.prescription-item-header h5 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #1E513B;
+}
+
+.delete-btn {
+  opacity: 0.7;
+  transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+  border-radius: 50%;
+  padding: 4px;
+  margin-right: 0; /* Fixed: removed negative margin to prevent icon from touching edge */
+  margin-left: 10px; /* Add left margin for spacing */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+  background-color: #e0e0e0; /* Slightly darker grey background on hover */
+}
+
+.prescription-item-details {
+  font-size: 14px;
+}
+
+.prescription-item-details p {
+  margin: 2px 0; /* Reduced vertical margins */
+  color: #555;
+}
+
+/* New styles for the 2-row layout */
+.prescription-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.prescription-item-row {
+  display: flex;
+}
+
+.prescription-item-row p {
+  margin-right: 16px;
+  flex: 1;
+  white-space: nowrap;
+}
+
+/* Style for instructions */
+.prescription-item-details > p {
+  margin-top: 2px;
+  font-style: italic;
+}
+
+.medication-search h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px 0;
+}
+
+/* Allergy panel specific styles */
+.allergy-panel-open .profile-content {
+  width: calc(100% - 27%);
+  transition: width 0.3s ease;
+}
+
+/* Panel styling (already exists, just checking) */
+.panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slide-in-panel {
+  position: fixed;
+  top: 60px;
+  right: 0;
+  width: 27%;
+  height: calc(100vh - 60px);
+  background-color: white;
+  z-index: 999;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
+  border-left: 2px solid #1E513B;
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+  transform: translateX(0);
+}
+
+.panel-header {
+  padding: 0 20px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f5f5f5;
+  height: 60px;
+}
+
+.panel-header h2 {
+  margin: 0;
+  color: #333;
+  font-weight: 500;
+  font-size: 18px;
+}
+
+.panel-content {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.panel-footer {
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Form controls inside panels */
+.panel-content .form-group {
+  margin-bottom: 16px;
+}
+
+.panel-content .form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #333;
+}
+
+.panel-content .form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.panel-content .form-control:focus {
+  border-color: #1E513B;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(30, 81, 59, 0.1);
+}
+
+.panel-content textarea.form-control {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* ... existing code ... */
+
+/* Radio button group styling */
+.radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 8px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.radio-option input[type="radio"] {
+  margin: 0;
+}
+
+.radio-option label {
+  margin: 0;
+  font-weight: normal;
+}
+
+/* Checkbox group styling */
+.checkbox-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.checkbox-option input[type="checkbox"] {
+  margin: 0;
+}
+
+.checkbox-option label {
+  margin: 0;
+  font-weight: normal;
+}
+
+/* Form validation styling */
+.error-input {
+  border-color: #dc3545 !important;
+  background-color: #fff8f8;
+}
+
+.error-text {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+/* Loading spinner for buttons */
+.button-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s linear infinite;
+}
+
+/* Button styles */
+.primary-button {
+  background-color: #1E513B;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 100px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.primary-button:hover {
+  background-color: #163c2a;
+}
+
+.primary-button:disabled {
+  background-color: #1E513B;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.secondary-button {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 100px;
+  height: 40px;
+}
+
+.secondary-button:hover {
+  background-color: #e9e9e9;
+}
+
+.secondary-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Panel footer adjustments */
+.panel-footer {
+  padding: 15px 20px;
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  border-top: 1px solid #e0e0e0;
+}
+
+.date-item-value {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.date-item-value.start {
+  background-color: #f0f7ff;
+  color: #0066cc;
+  border: 1px solid #d8e8fc;
+}
+
+.date-item-value.end {
+  background-color: #fdf5fa;
+  color: #cc0066;
+  border: 1px solid #f7e0f0;
+}
+
+/* Visit Tabs Section */
+.visit-tabs-container {
+  display: flex;
+  margin-top: 20px;
+  border-top: none;
+}
+
+.visit-tabs-sidebar {
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+  border-right: 1px solid #eee;
+  position: relative;
+}
+
+.visit-tabs-sidebar::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: calc(100% - 0px); /* Full height by default */
+  width: 2px;
+  background-color: #e0e0e0;
+  height: auto; /* Override the above height */
+  top: 0;
+  bottom: 0;
+}
+
+/* Set the correct height based on the number of tabs */
+.visit-tabs-sidebar::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2px;
+  background-color: #e0e0e0;
+  height: calc(39px * 3); /* Height of one tab (48px) multiplied by number of tabs (3) */
+  /* Alternatively: explicitly set top and height */
+  /* top: 0;
+  height: 144px; */ /* 3 tabs * 48px per tab */
+}
+
+.visit-tabs-content {
+  flex: 1;
+  padding-left: 20px;
+}
+
+.visit-tab-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 10px 10px 15px; /* Added left padding to accommodate the separator */
+  margin-bottom: 5px;
+  background: none;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333; /* Black text for all tabs */
+  position: relative;
+}
+
+.visit-tab-button:hover {
+  /* Adding a subtle, light green background on hover */
+  background-color: rgba(30, 81, 59, 0.05); /* Very light green with low opacity */
+}
+
+.visit-tab-button.active {
+  background-color: transparent; /* No background color */
+  font-weight: 700; /* Bold black text */
+  color: #333; /* Keep black text */
+  border-left: none; /* Remove the previous border */
+  position: relative; /* For positioning the green line */
+}
+
+.visit-tab-button.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: #1E513B; /* Dark green color used in the app */
+  height: 100%; /* Cover only the height of the selected tab */
+  z-index: 1; /* Ensure the green indicator is on top of the grey separator */
+}
+
+.visit-tab-button svg {
+  width: 16px;
+  height: 16px;
+  /* Removed fill, stroke and opacity styles to revert medicament icon */
+}
+
+/* We're no longer styling active tab icons differently */
+.visit-tab-button.active svg {
+  /* Removed all icon-specific styling */
+}
+
+/* Mobile view adjustments */
+@media (max-width: 768px) {
+  .visit-tabs-container {
+    flex-direction: column;
+  }
+  
+  .visit-tabs-sidebar {
+    flex: none;
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+    padding-right: 0;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+  }
+  
+  .visit-tab-button {
+    flex: 0 0 auto;
+    width: auto;
+  }
+  
+  .visit-tab-button.active::before {
+    width: 100%;
+    height: 3px;
+    top: auto;
+    bottom: -10px;
+  }
+  
+  .visit-tabs-content {
+    padding-left: 0;
+  }
+}
+
+.date-item-value.start {
+  background-color: transparent;
+  color: #555;
+  border: none;
+}
+
+.date-item-value.end {
+  background-color: transparent;
+  color: #555;
+  border: none;
+}
+
+.start-date {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.end-date {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+/* The date pill styling in the old design as well */
+.date-badge.start-date .date-value,
+.date-badge.end-date .date-value {
+  color: #555;
+  font-weight: 400;
+}
+
+/* Ensure there are no overriding styles elsewhere */
+.date-value {
+  font-size: 13px;
+  color: #555;
+  font-weight: 400;
+  background-color: transparent;
+}
+
+/* Medications Tab */
+.medications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Preserve visit-note-container and note-content styles for medications tab */
+.medications-tab .visit-note-container {
+  background-color: #f7f7f7;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 8px;
+}
+
+.medications-tab .note-content {
+  padding: 16px 16px 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  color: #333;
+}
+
+.medications-tab .note-content strong {
+  font-weight: 600;
+  color: #1E513B;
+}
+
+.medications-tab .note-footer {
+  padding: 0 2px;
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Old medication styles - kept for backwards compatibility */
+.medication-item {
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 12px 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.medication-name {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1E513B;
+  font-size: 15px;
+}
+
+.medication-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.medication-detail {
+  font-size: 13px;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #666;
+  margin-right: 4px;
+}
+
+/* Medications Tab - Loading state */
+.medications-tab .loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  color: #666;
+  font-size: 14px;
+}
+
+.medications-tab .loading-spinner .spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #1E513B;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 15px;
+}
+
+/* Consultations Tab - Loading state */
+.consultations-tab .loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  color: #666;
+  font-size: 14px;
+  width: auto;
+  height: auto;
+  border: none;
+  border-radius: 0;
+  animation: none;
+  position: static;
+  top: auto;
+  left: auto;
+  transform: none;
+}
+
+.consultations-tab .loading-spinner .spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #1E513B;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 15px;
+}
+
+.medications-tab .error-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  color: #d32f2f;
+  background-color: #fff6f6;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.visit-tab-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.tab-content {
+  min-height: 120px;
+}
+
+/* Notes Tab */
+.visit-note-container {
+  background-color: #f7f7f7;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 8px;
+}
+
+.note-content {
+  padding: 16px 16px 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  color: #333;
+}
+
+/* Remove the first-child padding since we now have top padding on the container */
+.note-content p:first-child {
+  padding-top: 0;
+}
+
+.note-footer {
+  padding: 0 2px;
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  align-items: center;
+}
+
+.note-footer .time {
+  font-weight: 500;
+}
+
+.note-footer .dot-separator {
+  margin: 0 8px;
+  font-size: 8px;
+}
+
+.note-footer .author {
+  font-weight: 500;
+}
+
+.note-footer .role {
+  color: #777;
+  margin-left: 4px;
+}
+
+.empty-tab-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  color: #666;
+  font-style: italic;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* Medications Tab */
+.medications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.medication-item {
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 12px 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.medication-name {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1E513B;
+  font-size: 15px;
+}
+
+.medication-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.medication-detail {
+  font-size: 13px;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #666;
+  margin-right: 4px;
+}
+
+/* Consultations Tab */
+.consultations-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 13px;
+}
+
+.consultations-table th {
+  text-align: left;
+  padding: 10px 15px;
+  background-color: #f8f9fa;
+  border-bottom: none;
+  color: #555;
+  font-weight: 600;
+}
+
+.consultations-table td {
+  padding: 10px 15px;
+  border-bottom: none;
+}
+
+.consultations-table tr {
+  border-bottom: 1px solid #eee;
+}
+
+.consultations-table .expand-cell {
+  width: 40px;
+  padding: 5px;
+  text-align: center;
+}
+
+.consultations-table .expand-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.consultations-table .expand-button .chevron-icon {
+  transition: transform 0.2s ease;
+}
+
+.consultations-table .expand-button.expanded .chevron-icon {
+  transform: rotate(180deg);
+}
+
+.consultations-table .expanded-row {
+  background-color: #f7f9fc;
+}
+
+.consultations-table .expanded-content {
+  padding: 15px 20px 15px 50px;
+  animation: fadeIn 0.3s ease;
+}
+
+.form-responses {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-response-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: baseline;
+}
+
+.response-label {
+  font-weight: 500;
+  color: #555;
+  margin-right: 5px;
+  min-width: 150px;
+}
+
+.response-value {
+  color: #333;
+  font-weight: 400;
+}
+
+.vital-signs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.vital-sign-item {
+  background-color: #fff;
+  padding: 10px 15px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.vital-sign-label {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.vital-sign-value {
+  font-size: 15px;
+  color: #1E513B;
+  font-weight: 600;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Mobile adjustments for consultations table */
+@media (max-width: 768px) {
+  .consultations-table th:nth-child(4),
+  .consultations-table td:nth-child(4) {
+    display: none;
+  }
+  
+  .consultations-table .expanded-content {
+    padding: 15px;
+  }
+  
+  .vital-signs-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ... existing code ... */
+
+/* Factures tab */
+.patient-factures {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Facture panel styles */
+.facture-panel-open .profile-content {
+  width: calc(100% - 450px);
+  transition: width 0.3s ease;
+}
+
+/* Add facture panel specific styles to match application standards */
+.sliding-panel .forms-panel-header {
+  height: 60px;
+  padding: 0 20px;
+  background-color: #bbbbbb; /* Lighter grey header background to match other panels */
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sliding-panel .forms-panel-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: black;
+}
+
+.sliding-panel .panel-close-button {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: #0b7262; /* Dark green color matching app's primary color */
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.sliding-panel .panel-close-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Adjust content width when facture panel is open to match other panels' behavior */
+.profile-content.facture-panel-open {
+  margin-right: 450px;
+  max-width: calc(100% - 450px);
+  transition: margin-right 0.3s ease, max-width 0.3s ease;
+}
+
+/* Facture panel consultation list styles */
+.facture-consultations-list {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  max-height: calc(100vh - 200px); /* Adjusted to account for bottom buttons */
+}
+
+.consultation-card {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: box-shadow 0.2s ease;
+  margin-bottom: 12px;
+}
+
+.consultation-card:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.consultation-header {
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #f0f8f4; /* Light green background */
+  padding: 0;
+  border-radius: 8px 8px 0 0;
+}
+
+.consultation-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1E513B;
+  margin: 0;
+  padding: 12px 16px;
+}
+
+.consultation-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px 16px 16px;
+}
+
+.consultation-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.meta-label {
+  font-weight: 600;
+  color: #555;
+  margin-right: 5px;
+}
+
+.meta-value {
+  color: #333;
+  font-weight: normal;
+}
+
+.consultation-price {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Align to the right */
+  gap: 8px;
+}
+
+.consultation-price label {
+  font-weight: 500;
+  color: #555;
+  font-size: 14px;
+  min-width: 70px;
+}
+
+.consultation-price {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.price-value {
+  font-weight: 600;
+  color: #1E513B;
+  font-size: 16px;
+}
+
+/* Add facture total styles */
+.facture-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.total-label {
+  font-weight: 600;
+  font-size: 16px;
+  color: #333;
+}
+
+.total-amount {
+  font-weight: 700;
+  font-size: 18px;
+  color: #1E513B;
+}
+
+/* Payment method container */
+.payment-method-container {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.payment-method-container label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.payment-method-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 15px;
+  background-color: white;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 30px;
+}
+
+.payment-method-select:focus {
+  border-color: #1E513B;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30, 81, 59, 0.15);
+}
+
+/* Facture panel footer with buttons */
+.facture-panel-footer {
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  padding: 15px 20px;
+  border-top: 1px solid #eee;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Two-row button layout for facture panel footer */
+.facture-panel-footer.two-row-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.facture-panel-footer .button-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.facture-panel-footer button {
+  flex: 1;
+  padding: 12px 0;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.facture-panel-footer .cancel-btn {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+}
+
+.facture-panel-footer .cancel-btn:hover {
+  background-color: #e5e7eb;
+}
+
+.facture-panel-footer .submit-btn {
+  background-color: #1E513B;
+  color: white;
+  border: none;
+}
+
+.facture-panel-footer .submit-btn:hover {
+  background-color: #164430;
+}
+
+.facture-panel-footer .generate-pdf-btn {
+  background-color: #0f3a2a;
+  color: white;
+  border: none;
+}
+
+.facture-panel-footer .generate-pdf-btn:hover {
+  background-color: #0a2819;
+}
+
+.facture-panel-footer .close-visit-btn {
+  background-color: #3182ce;
+  color: white;
+  border: none;
+}
+
+.facture-panel-footer .close-visit-btn:hover {
+  background-color: #2c5282;
+}
+
+.facture-panel-footer button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.button-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ... existing code ... */

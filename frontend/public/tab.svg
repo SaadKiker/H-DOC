@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">
+  <!-- Square container with very rounded corners -->
+  <rect x="0" y="0" width="1000" height="1000" rx="200" ry="200" fill="#285C46"/>
+  
+  <!-- Left vertical bar of H with rounded corners -->
+  <rect x="180" y="180" width="180" height="640" rx="60" ry="60" fill="white"/>
+  
+  <!-- Right vertical bar of H with rounded corners -->
+  <rect x="640" y="180" width="180" height="640" rx="60" ry="60" fill="white"/>
+  
+  <!-- Horizontal bar of H -->
+  <rect x="180" y="410" width="640" height="180" fill="white"/>
+</svg>

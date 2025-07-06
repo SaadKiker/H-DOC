@@ -1,0 +1,2894 @@
+/* Dashboard Styles */
+
+/* Admin label styles */
+.admin-label {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: rgba(220, 53, 69, 0.9);
+  color: white;
+  padding: 8px 15px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 9999;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+/* Main dashboard container */
+.agent-dashboard, .medecin-dashboard {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  padding-top: 60px; /* Add padding equal to header height */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Styling for Add Patient page - expand to full width */
+.add-patient-page .dashboard-content {
+  padding-left: 0 !important; /* Changed from 15px to 0 - remove left margin completely */
+  max-width: 100% !important;
+  margin-left: 0 !important;
+}
+
+/* Add Patient page - special handling to remove top margin */
+.add-patient-page {
+  padding-top: 0 !important; /* Override the parent padding-top */
+}
+
+.add-patient-page .dashboard-header {
+  position: relative !important; /* Change from fixed to relative to remove space at top */
+}
+
+/* Dashboard Content - Transition for facture panel */
+.dashboard-content {
+  transition: margin-right 0.3s ease;
+  width: 100%;
+}
+
+/* Make the content shift when facture panel is open */
+.dashboard-content.facture-panel-open {
+  margin-right: 450px; /* Match the panel width */
+  width: calc(100% - 450px);
+}
+
+/* 1. Header styles - make it sticky */
+.dashboard-header {
+  height: 60px;
+  background-color: #1E513B;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  width: 100%;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  max-width: 120px;
+  overflow: hidden;
+  margin-left: 60px; /* Increased margin to center within sidebar */
+}
+
+.logo-image {
+  width: auto;
+  height: 20px;
+  max-width: 100%;
+}
+
+.header-icons {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  position: relative;
+}
+
+.icon-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.user-button {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin-left: 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.user-button:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.user-button svg {
+  width: 26px;
+  height: 26px;
+}
+
+.add-patient-button {
+  background-color: rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.add-patient-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Notes button styling */
+.notes-button {
+  background-color: rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.notes-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Search component */
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+/* Search button styling */
+.search-button {
+  display: flex;
+  cursor: pointer;
+}
+
+/* Search panel */
+.search-panel {
+  position: absolute;
+  top: -20px; /* Not quite as high */
+  right: -10px; /* Positioned exactly -10px from right */
+  height: 40px;
+  display: flex;
+  align-items: center;
+  background-color: rgba(51, 107, 85, 0.5);
+  border-radius: 20px;
+  overflow: visible; /* Changed from hidden to visible to show search results */
+  width: 400px;
+  opacity: 1;
+  z-index: 1000;
+  margin-right: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.2s ease;
+}
+
+/* Search panel inner content */
+.search-panel-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 8px;
+  position: relative;
+  background-color: transparent;
+  z-index: 1000;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  /* Make the search more compact on mobile */
+  .search-panel {
+    width: 250px;
+    position: fixed;
+    top: 60px;
+    left: auto;
+    right: 10px;
+  }
+  
+  /* Position the search results better on mobile */
+  .search-results {
+    width: 250px;
+  }
+}
+
+.search-form {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.search-icon {
+  color: white;
+  margin: 0 8px;
+  min-width: 24px;
+  display: none; /* Hide this on desktop since the icon appears in the button */
+  justify-content: center;
+  height: 100%;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .search-icon {
+    display: flex; /* Show on mobile */
+  }
+}
+
+.search-input {
+  flex: 1;
+  border: none !important;
+  background-color: transparent !important;
+  background: transparent !important;
+  padding: 8px 12px;
+  font-size: 14px;
+  outline: none;
+  color: white !important;
+  width: 100%;
+  box-shadow: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Ensure the search panel has sufficient z-index */
+.search-panel {
+  z-index: 1000;
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.search-submit-btn {
+  display: none;
+}
+
+.close-search-btn {
+  background: none;
+  border: none;
+  padding: 0 8px;
+  color: white;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.close-search-btn:hover {
+  background-color: transparent;
+}
+
+.search-container.active .close-search-btn {
+  display: flex;
+  opacity: 1;
+}
+
+.search-results {
+  position: absolute !important;
+  top: 54px !important;
+  right: 149px !important; /* As requested */
+  width: 400px !important;
+  max-height: 400px !important;
+  background-color: white !important;
+  color: #333 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  z-index: 9999 !important; /* Very high z-index */
+  transform-origin: top right !important;
+  animation: fadeIn 0.2s ease !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.search-results-rdv {
+  position: absolute !important;
+  top: 47px !important;
+  right: 0px !important; /* As requested */
+  width: 330px !important;
+  max-height: 400px !important;
+  background-color: white !important;
+  color: #333 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  z-index: 9999 !important; /* Very high z-index */
+  transform-origin: top right !important;
+  animation: fadeIn 0.2s ease !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.search-results-doc {
+  position: absolute !important;
+  top: 54px !important;
+  right: 93px !important; /* As requested */
+  width: 400px !important;
+  max-height: 400px !important;
+  background-color: white !important;
+  color: #333 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  z-index: 9999 !important; /* Very high z-index */
+  transform-origin: top right !important;
+  animation: fadeIn 0.2s ease !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.search-results-rdv-doc {
+  position: absolute !important;
+  top: 60px !important;
+  right: 93px !important; /* As requested */
+  width: 400px !important;
+  max-height: 400px !important;
+  background-color: white !important;
+  color: #333 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  z-index: 9999 !important; /* Very high z-index */
+  transform-origin: top right !important;
+  animation: fadeIn 0.2s ease !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.search-results h3 {
+  margin: 0;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #666;
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 2;
+}
+
+.search-results-doc h3 {
+  margin: 0;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #666;
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 2;
+}
+
+.search-results-rdv h3 {
+  margin: 0;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #666;
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 2;
+}
+
+.patient-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.patient-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  outline: 1px solid transparent;
+}
+
+.patient-item:hover {
+  background-color: #f4f4f4;
+  /* outline: 1px solid #1E513B; */
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+}
+
+.patient-item:active {
+  background-color: #e9f5f0;
+  transform: translateY(1px);
+}
+
+
+.patient-item:last-child {
+  border-bottom: none;
+}
+
+.patient-avatar {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  background-color: #1E513B;
+  color: white;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 18px;
+  margin-right: 14px;
+}
+
+.patient-info {
+  flex: 1;
+}
+
+.patient-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.patient-name {
+  margin: 0;
+  font-weight: 600;
+  font-size: 15px;
+  color: #333;
+}
+
+
+.patient-details-second-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #555;
+}
+
+.patient-gender {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  padding: 0;
+  font-weight: 500;
+  margin-left: 4px;
+}
+
+/* Male styling */
+.patient-gender.male {
+  color: #0078d7;
+}
+
+/* Female styling */
+.patient-gender.female {
+  color: #e91e63;
+}
+
+/* Style for the new patient sex label - no background or border */
+.patient-sex-label {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  padding: 0;
+  font-weight: 500;
+  margin-left: 4px;
+}
+
+/* Male styling */
+.patient-sex-label.male {
+  color: #0078d7;
+}
+
+/* Female styling */
+.patient-sex-label.female {
+  color: #e91e63;
+}
+
+.patient-age {
+  font-weight: 500;
+}
+
+.patient-info-separator {
+  color: #ccc;
+  font-weight: 300;
+}
+
+.patient-birth {
+  color: #666;
+}
+
+.patient-id {
+  display: inline-block;
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  margin-top: 2px;
+  border: 1px solid #ddd;
+}
+
+.patient-id-value {
+  font-weight: 600;
+}
+
+.loading-message, .no-results {
+  text-align: center;
+  color: #666;
+  padding: 32px 16px;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.loading-message p, .no-results p {
+  margin: 8px 0 0;
+}
+
+.no-results-hint {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px !important;
+}
+
+.search-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(30, 81, 59, 0.2);
+  border-radius: 50%;
+  border-top-color: #1E513B;
+  animation: spin 1s linear infinite;
+  margin-bottom: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* User menu */
+.user-menu-container {
+  position: relative;
+}
+
+.user-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 220px;
+  background-color: rgb(255, 255, 255);
+  border-radius: 0px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-top: 10px;
+  z-index: 100;
+  overflow: hidden;
+  color: #333;
+}
+
+.user-info {
+  padding: 16px;
+  background-color: #f5f5f5;
+}
+
+.user-name {
+  margin: 0 0 4px 0;
+  font-weight: 600;
+  font-size: 15px;
+  color: #333;
+}
+
+.user-role {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+  text-transform: capitalize;
+}
+
+.menu-divider {
+  margin: 0;
+  border: none;
+  border-top: 1px solid #eee;
+}
+
+.menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  color: #333;
+}
+
+.menu-item:hover {
+  background-color: #f5f5f5;
+}
+
+.menu-item.logout {
+  color: white;
+  background-color: #dc3545;
+  margin: 0;
+  border-radius: 0;
+  padding: 12px 16px;
+  font-weight: 500;
+}
+
+.menu-item.logout:hover {
+  background-color: #bd2130;
+}
+
+/* Dashboard content */
+.dashboard-content {
+  width: 100%;
+  padding: 30px 25px; /* Increased horizontal padding */
+  padding-left: 345px; /* Padding accounting for sidebar */
+  padding-right: 145px; /* Padding accounting for sidebar */
+  box-sizing: border-box;
+}
+
+/* 2. Main title section */
+.main-title-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0 30px 0;
+}
+
+.title-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.main-title-section h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+  color: #1E513B;
+}
+
+/* Doctor specific styles */
+.doctor-info {
+  margin-top: 10px;
+  padding-left: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.doctor-info .subtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #666;
+  font-weight: normal;
+}
+
+.doctor-specialty {
+  font-size: 1.1rem;
+  color: #1E513B;
+  font-weight: 500;
+  margin: 0;
+  display: inline-block;
+  padding: 3px 10px;
+  background-color: rgba(30, 81, 59, 0.1);
+  border-radius: 4px;
+  max-width: fit-content;
+}
+
+/* 3. Summary cards */
+.summary-cards {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .summary-cards {
+    flex-direction: column;
+  }
+}
+
+.summary-card {
+  flex: 1;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.card-content {
+  padding: 20px;
+}
+
+.summary-card h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #333;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.date-selector {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #555;
+  background-color: #f9f9f9;
+}
+
+.summary-card .subtitle {
+  font-size: 12px;
+  color: #666;
+  margin: 0 0 4px 0;
+}
+
+.summary-card .value {
+  font-size: 35px;
+  font-weight: 600;
+  margin: 0;
+  color: #1E513B;
+  line-height: 1;
+}
+
+.value-with-refresh {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mini-refresh-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.mini-refresh-button:hover {
+  color: #1E513B;
+}
+
+/* 4. Active visits section */
+.active-visits-section {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+}
+
+.section-header {
+  padding: 20px;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+}
+
+.refresh-button {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #1E513B;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.refresh-button:hover {
+  background-color: rgba(30, 81, 59, 0.1);
+}
+
+.underline {
+  height: 4px;
+  width: 40px;
+  background-color: #1E513B;
+  margin-bottom: 16px;
+}
+
+.search-filter-bar {
+  padding: 0 20px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-input {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  flex: 1;
+  max-width: 300px;
+}
+
+.visits-table-container {
+  padding: 0px 0px 0px 0px;
+  overflow-x: auto;
+}
+
+.visits-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  table-layout: fixed;
+}
+
+.visits-table th {
+  background-color: #f5f5f5;
+  color: #555;
+  font-weight: 600;
+  text-align: left;
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  white-space: nowrap;
+}
+
+.visits-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+  color: #333;
+}
+
+.visits-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Completely removed hover background effect for table rows */
+.visits-table tr:hover {
+  background-color: transparent !important;
+}
+
+.visits-table th:nth-child(1) {
+  width: 18%; /* Patient name */
+}
+
+.visits-table th:nth-child(2),
+.visits-table th:nth-child(3) {
+  width: 8%; /* Sexe and Age columns */
+}
+
+.visits-table th:nth-child(4),
+.visits-table th:nth-child(5) {
+  width: 12%; /* Type de visite and Service */
+}
+
+.visits-table th:nth-child(6) {
+  width: 16%; /* Prestataire */
+}
+
+.visits-table th:nth-child(7) {
+  width: 12%; /* Time/Arrivée */
+}
+
+/* For the Actions column in the appointments table */
+.visits-table th:nth-child(8) {
+  width: 14%;
+}
+
+/* Provider column styling - ensures consistent width */
+.provider-col {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron-icon {
+  cursor: pointer;
+  color: #777;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  transition: transform 0.2s ease;
+}
+
+.chevron-icon.expanded {
+  transform: rotate(90deg);
+}
+
+/* Patient name cell - make it look like a clickable link */
+.patient-name-cell {
+  color: #2c62e8 !important; /* Force blue color with !important */
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.visit-badge {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 11px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background-color: #1E513B;
+  color: white;
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+.late-badge {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 11px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background-color: #ff5722;
+  color: white;
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+.late-appointment {
+  background-color: #fff8f6 !important;
+}
+
+/* Hover effect for normal rows */
+.visits-table tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* Disable hover effect on late appointment rows (keep their custom background) */
+.visits-table tr.late-appointment:hover {
+  background-color: #fff8f6 !important;
+}
+
+.patient-name-cell:hover {
+  text-decoration: underline;
+}
+
+.visit-time {
+  white-space: nowrap;
+}
+
+.visit-details {
+  background-color: #f5f5f5;
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+  display: none;
+}
+
+.visit-details.visible {
+  display: block;
+}
+
+.visit-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.visit-detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.visit-detail-label {
+  font-size: 12px;
+  color: #777;
+  margin-bottom: 2px;
+}
+
+.visit-detail-value {
+  font-weight: 500;
+}
+
+.visit-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  justify-content: flex-end;
+}
+
+.visit-action-button {
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.view-button {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.view-button:hover {
+  background-color: #e0e0e0;
+}
+
+.end-button {
+  background-color: #1E513B;
+  color: white;
+}
+
+.end-button:hover {
+  background-color: #143c2b;
+}
+
+.no-visits-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  min-height: 200px;
+  text-align: center;
+}
+
+.no-visits-container p {
+  margin-top: 16px;
+  color: #777;
+  font-size: 16px;
+}
+
+.loading-container, .error-container {
+  padding: 40px 20px;
+  text-align: center;
+  color: #777;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.error-container {
+  color: #d32f2f;
+}
+
+/* Existing role pages styles */
+.role-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  text-align: center;
+}
+
+.agent-page {
+  background: linear-gradient(to bottom right, #f0f8ff, #e6f5ff);
+}
+
+.medecin-page {
+  background: linear-gradient(to bottom right, #f0fff0, #e6ffec);
+}
+
+.admin-page {
+  background: linear-gradient(to bottom right, #fcf0ff, #f5e6ff);
+}
+
+.role-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  width: 90%;
+  max-width: 600px;
+}
+
+.placeholder-icon {
+  margin-bottom: 1.5rem;
+  color: #1E513B;
+}
+
+.logout-button {
+  margin-top: 1.5rem;
+  padding: 0.5rem 1.5rem;
+  background-color: #1E513B;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+  background-color: #143c2b;
+}
+
+/* Dashboard tabs - make transitions faster */
+.dashboard-tabs {
+  display: flex;
+  background-color: white;
+  padding: 0;
+  position: fixed;
+  left: 0;
+  top: 60px;
+  bottom: 0;
+  width: 220px;
+  flex-direction: column;
+  padding-top: 20px;
+  border-right: 1px solid #e5e5e5;
+  z-index: 10;
+  box-shadow: 1px 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.tab-button {
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  background: none;
+  border: none;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.1s ease; /* Faster transition */
+  margin-bottom: 2px;
+  text-align: left;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  border-radius: 0; /* Remove border radius */
+}
+
+.tab-button:hover {
+  color: #1E513B;
+  background-color: rgba(30, 81, 59, 0.05);
+}
+
+.tab-button.active {
+  color: #1E513B;
+  border-left-color: #1E513B;
+  background-color: rgba(30, 81, 59, 0.08);
+  font-weight: 600;
+}
+
+/* Make responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard-tabs {
+    position: static;
+    width: 100%;
+    flex-direction: row;
+    padding: 0 15px;
+    overflow-x: auto;
+    border-right: none;
+    top: 60px;
+  }
+  
+  .tab-button {
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    padding: 15px 15px;
+    margin-right: 10px;
+    margin-bottom: 0;
+    width: auto;
+  }
+  
+  .tab-button.active {
+    border-left-color: transparent;
+    border-bottom-color: #1E513B;
+  }
+  
+  .dashboard-content {
+    width: 100%;
+    padding: 24px; /* Even padding on all sides for mobile */
+  }
+}
+
+/* Common section container styles */
+.section-container {
+  background-color: white !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+  padding: 0px !important;
+}
+
+.section-container-2 {
+  background-color: white !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+  padding: 20px !important;
+}
+
+/* Upcoming Visits Section */
+.upcoming-visits-section {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+  padding: 0;
+}
+
+.upcoming-visits-section .section-header {
+  padding: 20px;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.upcoming-visits-section h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+}
+
+.upcoming-visits-section .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  min-height: 200px;
+  text-align: center;
+  color: #777;
+}
+
+.upcoming-visits-section .loading-container {
+  padding: 40px 20px;
+  text-align: center;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.upcoming-visits-section .spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(30, 81, 59, 0.2);
+  border-radius: 50%;
+  border-top-color: #1E513B;
+  animation: spin 1s linear infinite;
+  margin-bottom: 8px;
+}
+
+.upcoming-visits-section .error-container {
+  padding: 20px;
+  text-align: center;
+  color: #d32f2f;
+  background-color: #fff2f2;
+  border-radius: 4px;
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Make patient names blue in dashboard tables */
+.visits-table .patient-name-cell {
+  color: #2c62e8 !important; /* Force blue color with !important */
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.visits-table .patient-name-cell:hover {
+  text-decoration: underline;
+}
+
+/* Remove all vertical padding from table cells */
+.upcoming-visits-section .visits-table tr td {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.upcoming-visits-section .visits-table tr td:last-child {
+  padding: 0;
+}
+
+/* Visits table button styling */
+.upcoming-visits-section .visits-table .start-visit-button {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  padding: 12px 10px;
+  margin: 0;
+}
+
+/* Start Visit button in upcoming appointments table */
+.start-visit-button {
+  background-color: #1E513B;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+/* Remove cell padding around the button in tables */
+.visits-table td:last-child {
+  padding: 0 !important;
+  vertical-align: middle !important;
+  height: 100%;
+  line-height: 0;
+}
+
+/* Ensure consistent button styling in tables */
+.visits-table .start-visit-button {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  padding: 12px 10px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.start-visit-button:hover {
+  background-color: #16402F;
+}
+
+/* Actions cell styling for horizontal button layout */
+.actions-cell {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  padding: 10px !important;
+  gap: 15px !important;
+  justify-content: flex-end !important;
+}
+
+/* Edit cell styling */
+.edit-cell {
+  padding: 0 !important;
+  width: 50px;
+  text-align: center;
+  vertical-align: middle !important;
+}
+
+/* Start cell styling */
+.start-cell {
+  padding: 0 !important;
+  vertical-align: middle !important;
+}
+
+/* Edit button container */
+.edit-button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 8px;
+}
+
+/* Start button container */
+.start-button-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* Edit button styling */
+.edit-appointment-button.action-button {
+  height: 36px;
+  width: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: 0px solid #e0e0e0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-appointment-button.action-button:hover {
+  background-color: #f5f5f5;
+}
+
+/* Delete button styling */
+.delete-appointment-button.action-button {
+  height: 36px;
+  width: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: 0px solid #e0e0e0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delete-appointment-button.action-button:hover {
+  background-color: #fff0f0;
+}
+
+.delete-appointment-button.action-button svg {
+  width: 18px;
+  height: 18px;
+  color: #d32f2f;
+}
+
+/* Update start visit button with green background */
+.start-visit-button.action-button {
+  background-color: #1E513B;
+  color: white;
+  height: 100%;
+  width: 100%;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 10px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.start-visit-button.action-button:hover {
+  background-color: #16402F;
+}
+
+.edit-appointment-button.action-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Add styles for the appointment type display */
+.appointment-event-type {
+  font-size: 0.8rem;
+  margin-top: 2px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  display: inline-block;
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #333;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Adjust existing appointment event styles for better display with type */
+.appointment-event {
+  padding: 4px;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.appointment-event-header {
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.appointment-event-time {
+  font-size: 0.8rem;
+  color: #333;
+  margin-top: 2px;
+}
+
+.appointment-event-doctor {
+  font-size: 0.8rem;
+  color: #333;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.appointment-event-comment {
+  font-size: 0.75rem;
+  color: #333;
+  margin-top: 4px;
+  max-height: 48px;
+  overflow: hidden;
+}
+
+/* For dark backgrounds, override with light text */
+.fc-event-main[style*="background-color: rgb(30, 81, 59)"] .appointment-event-header,
+.fc-event-main[style*="background-color: rgb(30, 81, 59)"] .appointment-event-type,
+.fc-event-main[style*="background-color: rgb(30, 81, 59)"] .appointment-event-time,
+.fc-event-main[style*="background-color: rgb(30, 81, 59)"] .appointment-event-doctor,
+.fc-event-main[style*="background-color: rgb(30, 81, 59)"] .appointment-event-comment,
+.fc-event-main[style*="background-color: rgb(131, 56, 236)"] .appointment-event-header,
+.fc-event-main[style*="background-color: rgb(131, 56, 236)"] .appointment-event-type,
+.fc-event-main[style*="background-color: rgb(131, 56, 236)"] .appointment-event-time,
+.fc-event-main[style*="background-color: rgb(131, 56, 236)"] .appointment-event-doctor,
+.fc-event-main[style*="background-color: rgb(131, 56, 236)"] .appointment-event-comment,
+.fc-event-main[style*="background-color: rgb(255, 0, 110)"] .appointment-event-header,
+.fc-event-main[style*="background-color: rgb(255, 0, 110)"] .appointment-event-type,
+.fc-event-main[style*="background-color: rgb(255, 0, 110)"] .appointment-event-time,
+.fc-event-main[style*="background-color: rgb(255, 0, 110)"] .appointment-event-doctor,
+.fc-event-main[style*="background-color: rgb(255, 0, 110)"] .appointment-event-comment {
+  color: #fff;
+}
+
+/* Responsive adjustments for calendar events */
+@media (max-width: 768px) {
+  .appointment-event-type {
+    font-size: 0.7rem;
+    padding: 1px 3px;
+  }
+  
+  .appointment-event-header {
+    font-size: 0.9rem;
+  }
+  
+  .appointment-event-time,
+  .appointment-event-doctor {
+    font-size: 0.75rem;
+  }
+  
+  .appointment-event-comment {
+    font-size: 0.7rem;
+    max-height: 36px;
+  }
+}
+
+/* Sliding Panel for Visit Form */
+.sliding-panel {
+  position: fixed;
+  top: 0;
+  right: -450px;
+  width: 450px;
+  height: 100vh;
+  background-color: #fff;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: right 0.3s ease;
+  overflow-y: auto;
+}
+
+/* Agent role appointment form panel styling - enhanced UI */
+.agent-dashboard .appointment-form-panel {
+  width: 420px;
+  background-color: #ffffff;
+  box-shadow: -3px 0 15px rgba(0, 0, 0, 0.12);
+  border-left: 1px solid #eaeaea;
+}
+
+.agent-dashboard .side-panel-header {
+  background-color: #f8f9fa;
+  padding: 18px 24px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.agent-dashboard .side-panel-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1E513B;
+}
+
+.agent-dashboard .close-panel-btn {
+  color: #495057;
+  font-size: 22px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.agent-dashboard .close-panel-btn:hover {
+  opacity: 1;
+}
+
+.agent-dashboard .side-panel-content {
+  padding: 24px;
+}
+
+.agent-dashboard .form-group {
+  margin-bottom: 22px;
+}
+
+.agent-dashboard .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #495057;
+}
+
+.agent-dashboard .form-group input,
+.agent-dashboard .form-group select,
+.agent-dashboard .form-group textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: all 0.2s;
+  background-color: #fff;
+}
+
+.agent-dashboard .form-group input:focus,
+.agent-dashboard .form-group select:focus,
+.agent-dashboard .form-group textarea:focus {
+  border-color: #1E513B;
+  box-shadow: 0 0 0 2px rgba(30, 81, 59, 0.1);
+  outline: none;
+}
+
+.agent-dashboard .selected-patient {
+  padding: 12px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%; /* Ensure full width */
+  background-color: #f9f9f9;
+}
+
+.agent-dashboard .patient-info {
+  flex: 1;
+}
+
+.agent-dashboard .patient-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: #212529;
+  margin-bottom: 4px;
+}
+
+.agent-dashboard .patient-details {
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.agent-dashboard .clear-selection-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+  transition: all 0.2s;
+  background-color: #e9ecef;
+  font-size: 16px;
+}
+
+.agent-dashboard .clear-selection-btn:hover {
+  background-color: #dee2e6;
+  color: #495057;
+}
+
+.agent-dashboard .search-container {
+  position: relative;
+  width: 100%; /* Ensure full width */
+  display: block; /* Match the display of other form fields */
+}
+
+.agent-dashboard .search-container input {
+  padding-right: 35px;
+  width: 100%; /* Ensure the input takes full width */
+}
+
+.agent-dashboard .search-spinner {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.agent-dashboard .search-results-rdv {
+  margin-top: 5px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%; /* Ensure full width */
+  position: absolute; /* Position it below the input */
+  z-index: 10; /* Ensure it appears above other elements */
+  background-color: white; /* Add background color */
+}
+
+.agent-dashboard .error-message {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 12px 16px;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.agent-dashboard .form-actions {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e9ecef;
+}
+
+.agent-dashboard .cancel-btn,
+.agent-dashboard .submit-btn,
+.agent-dashboard .delete-btn {
+  padding: 12px 20px;
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.agent-dashboard .cancel-btn {
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  color: #495057;
+}
+
+.agent-dashboard .cancel-btn:hover {
+  background-color: #e9ecef;
+}
+
+.agent-dashboard .submit-btn {
+  background-color: #1E513B;
+  border: 1px solid #1E513B;
+  color: white;
+}
+
+.agent-dashboard .submit-btn:hover {
+  background-color: #16402F;
+}
+
+.agent-dashboard .delete-btn {
+  background-color: #dc3545;
+  border: 1px solid #dc3545;
+  color: white;
+}
+
+.agent-dashboard .delete-btn:hover {
+  background-color: #c82333;
+}
+
+/* Delete confirmation modal styling */
+.agent-dashboard .delete-confirmation-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  width: 400px;
+  z-index: 1100;
+}
+
+.agent-dashboard .delete-confirmation-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.agent-dashboard .delete-confirmation-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #212529;
+}
+
+.agent-dashboard .delete-confirmation-content {
+  padding: 20px;
+}
+
+.agent-dashboard .delete-confirmation-content p {
+  margin: 0 0 10px;
+  color: #495057;
+}
+
+.agent-dashboard .delete-confirmation-content p:last-child {
+  margin-bottom: 0;
+  font-style: italic;
+  color: #6c757d;
+}
+
+.agent-dashboard .delete-confirmation-actions {
+  padding: 16px 20px;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Fix for the delete confirmation modal buttons */
+.agent-dashboard .delete-confirmation-actions .cancel-btn,
+.agent-dashboard .delete-confirmation-actions .delete-btn {
+  min-width: 120px;
+  flex: 1;
+  max-width: 150px;
+  text-align: center;
+  display: inline-block;
+  padding: 10px 15px;
+}
+
+.agent-dashboard .delete-confirmation-actions .delete-btn {
+  background-color: #dc3545;
+  border: 1px solid #dc3545;
+  color: white;
+}
+
+.agent-dashboard .delete-confirmation-actions .delete-btn:hover {
+  background-color: #c82333;
+}
+
+.agent-dashboard .delete-confirmation-actions .cancel-btn {
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  color: #495057;
+}
+
+.agent-dashboard .delete-confirmation-actions .cancel-btn:hover {
+  background-color: #e9ecef;
+}
+
+.sliding-panel.open {
+  right: 0;
+}
+
+/* Sliding Panel Overlay - adds a dimming effect when panels are open */
+.sliding-panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1045; /* Just below the panel z-index */
+  display: none;
+  transition: opacity 0.2s ease;
+  pointer-events: auto; /* Ensure clicks on overlay are captured */
+}
+
+.sliding-panel-overlay.visible {
+  display: block;
+}
+
+.sliding-panel-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.forms-panel-header {
+  height: 60px;
+  padding: 0 20px;
+  background-color: #bbbbbb;
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.forms-panel-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: black;
+}
+
+.panel-close-button {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: #0b7262;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.panel-close-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.panel-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.facture-consultations-list {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+}
+
+.consultation-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #ffffff;
+}
+
+.consultation-header {
+  margin-bottom: 12px;
+}
+
+.consultation-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.consultation-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.consultation-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meta-label {
+  font-size: 14px;
+  color: #333;
+  min-width: 80px;
+  font-weight: 600;
+}
+
+.meta-value {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.consultation-price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.price-input {
+  width: 100px;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.price-currency {
+  font-size: 14px;
+  color: #333;
+}
+
+.price-value {
+  font-weight: 600;
+  color: #1E513B;
+  font-size: 16px;
+}
+
+.facture-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+}
+
+.total-label {
+  font-weight: 600;
+  font-size: 16px;
+  color: #333;
+}
+
+.total-amount {
+  font-weight: 700;
+  font-size: 18px;
+  color: #1E513B;
+}
+
+.payment-method {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.payment-method label {
+  font-weight: 500;
+  font-size: 14px;
+  color: #555;
+}
+
+.payment-method select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+}
+
+.payment-method select.input-error {
+  border-color: #e53e3e;
+}
+
+.error-message {
+  color: #e53e3e;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.facture-panel-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #e0e0e0;
+}
+
+.cancel-btn, .submit-btn, .generate-pdf-btn {
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.submit-btn {
+  background-color: #1E513B;
+  border: none;
+  color: white;
+}
+
+.generate-pdf-btn {
+  background-color: #2c62e8;
+  color: white;
+  border: none;
+}
+
+.cancel-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.submit-btn:hover {
+  background-color: #164430;
+}
+
+.generate-pdf-btn:hover {
+  background-color: #2252cc;
+}
+
+.cancel-btn:disabled, .submit-btn:disabled, .generate-pdf-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.loading-state, .error-state, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.spinner, .button-spinner {
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top: 3px solid #1E513B;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
+.button-spinner {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+  border-top-color: white;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Action button styling similar to other dashboard buttons */
+.action-button {
+  background-color: #1E513B;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.action-button:hover {
+  background-color: #164430;
+}
+
+/* Factures en attente table styles - Agent Dashboard Only */
+.factures-container .factures-section .factures-table tbody td {
+  padding-left: 16px; /* Consistent left padding for all content cells */
+  height: 45px; /* Consistent row height for both tables */
+}
+
+/* Facturer button styling - match the Voir PDF style */
+.factures-container .factures-section .factures-table .start-visit-button.action-button {
+  height: auto;
+  background-color: transparent;
+  color: #166534; /* Dark green text */
+  text-decoration: underline;
+  border: none;
+  font-size: 14px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: none;
+  border-radius: 0;
+  
+}
+
+/* Remove hover style for Facturer button */
+
+/* Override any inherited transforms and shadows on hover */
+.factures-container .factures-section .factures-table .start-visit-button.action-button:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+/* Add margin to the "Factures réglées aujourd'hui" section */
+.factures-container .factures-section:nth-of-type(2) .section-header {
+  margin-top: 50px;
+}
+
+/* Voir PDF button styling in the "Factures réglées aujourd'hui" table */
+.factures-container .factures-section .view-invoice-button {
+  background-color: transparent;
+  border: none;
+  color: #166534; /* Dark green text */
+  text-decoration: underline;
+  font-size: 14px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.factures-container .factures-section .view-invoice-button:hover {
+  color: #125a2b; /* Slightly darker green on hover */
+  background-color: transparent;
+}
+
+/* Make Facture panel consultation cards more visible with stronger styling */
+.sliding-panel .consultation-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #ffffff !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sliding-panel .consultation-header {
+  margin-bottom: 12px;
+}
+
+.sliding-panel .consultation-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333 !important;
+}
+
+.sliding-panel .consultation-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sliding-panel .consultation-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+}
+
+.sliding-panel .meta-item {
+  display: flex;
+  align-items: flex-start !important;
+  margin-top: 5px !important;
+}
+
+.sliding-panel .meta-label {
+  font-size: 14px;
+  color: #000000 !important;
+  font-weight: 600 !important;
+  margin-right: 5px !important;
+}
+
+.sliding-panel .meta-value {
+  font-size: 14px !important;
+  color: #000000 !important;
+  font-weight: 500 !important;
+  margin-top: 3px !important;
+}
+
+.sliding-panel .consultation-price {
+  margin-top: 5px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.sliding-panel .consultation-price .meta-label {
+  font-size: 14px !important;
+  color: #000000 !important;
+  font-weight: 600 !important;
+  margin-right: 5px !important;
+}
+
+.sliding-panel .consultation-price .price-value {
+  font-weight: 600 !important;
+  color: #1E513B !important;
+  font-size: 16px !important;
+}
+
+/* Additional styles for visit form */
+.visit-form {
+  padding: 15px 20px 0 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.visit-form .form-section {
+  margin-bottom: 20px;
+  padding: 0 0 15px 0;
+  border-bottom: none;
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 6px;
+}
+
+.visit-form .form-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.visit-form .form-section h3 {
+  font-size: 16px;
+  color: #333;
+  margin: 0 0 10px 0;
+  font-weight: 600;
+}
+
+.visit-form .form-row {
+  display: flex;
+  gap: 15px;
+}
+
+.visit-form .form-group {
+  flex: 1;
+  margin-bottom: 10px;
+}
+
+.visit-form .form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #555;
+}
+
+.visit-form .form-group input,
+.visit-form .form-group select {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background-color: #f5f5f5;
+}
+
+.visit-form .form-group input:focus,
+.visit-form .form-group select:focus {
+  border-color: transparent;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(30, 81, 59, 0.1);
+}
+
+.visit-form .radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.visit-form .radio-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
+
+.visit-form .radio-option input[type="radio"] {
+  width: 16px;
+  height: 16px;
+}
+
+.visit-form .radio-label {
+  font-weight: 500;
+}
+
+.visit-form .form-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: auto;
+  padding: 15px 0;
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-top: none;
+}
+
+.visit-form .cancel-btn,
+.visit-form .submit-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  max-width: 45%;
+}
+
+.visit-form .cancel-btn {
+  background-color: #f0f0f0;
+  border: none;
+  color: #333;
+}
+
+.visit-form .cancel-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.visit-form .submit-btn {
+  background-color: #1E513B;
+  border: none;
+  color: white;
+}
+
+.visit-form .submit-btn:hover {
+  background-color: #164430;
+}
+
+.visit-form .submit-btn:disabled,
+.visit-form .cancel-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.sliding-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  padding: 0 20px;
+  background-color: white;
+  color: #333;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sliding-panel-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.close-panel-button {
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.close-panel-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Read-only label styling for Admin users */
+.read-only-label {
+  color: #666;
+  font-style: italic;
+  font-size: 0.9em;
+  padding: 4px 8px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+/* Visit notes styling */
+.visit-notes {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #555;
+  font-style: italic;
+}
+
+/* Special styling for notes in medecin and admin dashboard */
+.medecin-dashboard .visits-table .visit-notes,
+.admin-dashboard .visits-table .visit-notes {
+  max-width: none;
+  width: auto;
+  min-width: 200px;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  padding: 8px 12px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.visit-notes:hover {
+  white-space: normal;
+  overflow: visible;
+  background-color: #f9f9f9;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border-radius: 4px;
+  padding: 5px;
+}
+
+/* Adjust hover behavior for medecin and admin dashboard notes */
+.medecin-dashboard .visits-table .visit-notes:hover,
+.admin-dashboard .visits-table .visit-notes:hover {
+  background-color: transparent;
+  box-shadow: none;
+  padding: 8px 12px;
+  z-index: 1;
+}
+
+/* Adjust table layout for medecin and admin dashboard */
+.medecin-dashboard .visits-table,
+.admin-dashboard .visits-table {
+  table-layout: auto;
+}
+
+.medecin-dashboard .visits-table-container,
+.admin-dashboard .visits-table-container {
+  overflow-x: auto;
+}
+
+/* Increase spacing between columns for medecin and admin dashboard's Patient Actuel table */
+.medecin-dashboard .active-visits-section .visits-table td,
+.medecin-dashboard .active-visits-section .visits-table th,
+.admin-dashboard .active-visits-section .visits-table td,
+.admin-dashboard .active-visits-section .visits-table th {
+  padding: 12px 20px; /* Increased padding */
+}
+
+/* Adjust column widths for medecin dashboard */
+/* For tables that still have the notes column (non-Patient Actuel tables) */
+.medecin-dashboard .upcoming-visits-section .visits-table th:nth-child(1),
+.medecin-dashboard .upcoming-visits-section .visits-table td:nth-child(1) {
+  width: 15%;
+}
+
+.medecin-dashboard .upcoming-visits-section .visits-table th:nth-child(2),
+.medecin-dashboard .upcoming-visits-section .visits-table td:nth-child(2),
+.medecin-dashboard .upcoming-visits-section .visits-table th:nth-child(3),
+.medecin-dashboard .upcoming-visits-section .visits-table td:nth-child(3) {
+  width: 5%;
+}
+
+.medecin-dashboard .upcoming-visits-section .visits-table th:nth-child(4),
+.medecin-dashboard .upcoming-visits-section .visits-table td:nth-child(4),
+.medecin-dashboard .upcoming-visits-section .visits-table th:nth-child(5),
+.medecin-dashboard .upcoming-visits-section .visits-table td:nth-child(5),
+.medecin-dashboard .upcoming-visits-section .visits-table th:nth-child(6),
+.medecin-dashboard .upcoming-visits-section .visits-table td:nth-child(6) {
+  width: 10%;
+}
+
+.medecin-dashboard .upcoming-visits-section .visits-table th:nth-child(7),
+.medecin-dashboard .upcoming-visits-section .visits-table td:nth-child(7) {
+  width: 35%; /* Give notes column more space */
+}
+
+/* Special column widths for Patient Actuel table (without notes column) */
+.medecin-dashboard .active-visits-section .visits-table th:nth-child(1),
+.medecin-dashboard .active-visits-section .visits-table td:nth-child(1) {
+  width: 20%; /* Increased width for patient name */
+}
+
+.medecin-dashboard .active-visits-section .visits-table th:nth-child(2),
+.medecin-dashboard .active-visits-section .visits-table td:nth-child(2),
+.medecin-dashboard .active-visits-section .visits-table th:nth-child(3),
+.medecin-dashboard .active-visits-section .visits-table td:nth-child(3) {
+  width: 8%; /* Increased width for sex and age */
+}
+
+.medecin-dashboard .active-visits-section .visits-table th:nth-child(4),
+.medecin-dashboard .active-visits-section .visits-table td:nth-child(4),
+.medecin-dashboard .active-visits-section .visits-table th:nth-child(5),
+.medecin-dashboard .active-visits-section .visits-table td:nth-child(5),
+.medecin-dashboard .active-visits-section .visits-table th:nth-child(6),
+.medecin-dashboard .active-visits-section .visits-table td:nth-child(6) {
+  width: 18%; /* Increased width for visit type, service, and arrival time */
+}
+
+/* Special column widths for medecin dashboard's upcoming visits table (without service column) */
+.medecin-dashboard .upcoming-visits-section .visits-table th:nth-child(1),
+.medecin-dashboard .upcoming-visits-section .visits-table td:nth-child(1) {
+  width: 20%; /* Increased width for patient name */
+}
+
+.medecin-dashboard .upcoming-visits-section .visits-table th:nth-child(2),
+.medecin-dashboard .upcoming-visits-section .visits-table td:nth-child(2),
+.medecin-dashboard .upcoming-visits-section .visits-table th:nth-child(3),
+.medecin-dashboard .upcoming-visits-section .visits-table td:nth-child(3) {
+  width: 10%; /* Increased width for sex and age */
+}
+
+.medecin-dashboard .upcoming-visits-section .visits-table th:nth-child(4),
+.medecin-dashboard .upcoming-visits-section .visits-table td:nth-child(4) {
+  width: 13%; /* Increased width for visit type */
+}
+
+.medecin-dashboard .upcoming-visits-section .visits-table th:nth-child(5),
+.medecin-dashboard .upcoming-visits-section .visits-table td:nth-child(5) {
+  width: 10%; /* Increased width for arrival time */
+}
+
+.medecin-dashboard .upcoming-visits-section .visits-table th:nth-child(6),
+.medecin-dashboard .upcoming-visits-section .visits-table td:nth-child(6) {
+  width: 40%; /* Increased width for notes */
+}
+
+/* Admin dashboard upcoming visits table styling */
+.admin-dashboard .upcoming-visits-section .visits-table td,
+.admin-dashboard .upcoming-visits-section .visits-table th {
+  padding: 12px 20px; /* Increased padding */
+}
+
+.admin-dashboard .upcoming-visits-section .visits-table th:nth-child(1),
+.admin-dashboard .upcoming-visits-section .visits-table td:nth-child(1) {
+  width: 18%; /* Width for patient name */
+}
+
+.admin-dashboard .upcoming-visits-section .visits-table th:nth-child(2),
+.admin-dashboard .upcoming-visits-section .visits-table td:nth-child(2),
+.admin-dashboard .upcoming-visits-section .visits-table th:nth-child(3),
+.admin-dashboard .upcoming-visits-section .visits-table td:nth-child(3) {
+  width: 8%; /* Width for sex and age */
+}
+
+.admin-dashboard .upcoming-visits-section .visits-table th:nth-child(4),
+.admin-dashboard .upcoming-visits-section .visits-table td:nth-child(4) {
+  width: 13%; /* Increased width for visit type */
+}
+
+.admin-dashboard .upcoming-visits-section .visits-table th:nth-child(5),
+.admin-dashboard .upcoming-visits-section .visits-table td:nth-child(5) {
+  width: 12%; /* Width for service */
+}
+
+.admin-dashboard .upcoming-visits-section .visits-table th:nth-child(6),
+.admin-dashboard .upcoming-visits-section .visits-table td:nth-child(6) {
+  width: 16%; /* Width for prestataire */
+}
+
+.admin-dashboard .upcoming-visits-section .visits-table th:nth-child(7),
+.admin-dashboard .upcoming-visits-section .visits-table td:nth-child(7) {
+  width: 10%; /* Width for arrival time */
+}
+
+.admin-dashboard .upcoming-visits-section .visits-table th:nth-child(8),
+.admin-dashboard .upcoming-visits-section .visits-table td:nth-child(8) {
+  width: 15%; /* Width for notes */
+}
+
+/* Agent dashboard appointment form actions styling */
+.agent-dashboard .agent-form-actions {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Improved cancel button for agent */
+.agent-dashboard .agent-form-actions .cancel-btn {
+  background-color: transparent;
+  border: 1px solid #ced4da;
+  color: #495057;
+  padding: 10px 18px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: none;
+}
+
+.agent-dashboard .agent-form-actions .cancel-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #b1b7bd;
+}
+
+/* Improved submit button for agent */
+.agent-dashboard .agent-form-actions .submit-btn {
+  background-color: #1E513B;
+  border: 1px solid #1E513B;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(30, 81, 59, 0.2);
+}
+
+.agent-dashboard .agent-form-actions .submit-btn:hover {
+  background-color: #16402F;
+  box-shadow: 0 3px 6px rgba(30, 81, 59, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Delete icon button styling for agent */
+.agent-dashboard .agent-form-actions .delete-icon-btn {
+  background-color: transparent;
+  border: none;
+  color: #dc3545;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 0;
+  margin-left: auto;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.agent-dashboard .agent-form-actions .delete-icon-btn:hover {
+  background-color: rgba(220, 53, 69, 0.1);
+  transform: translateY(-1px);
+}
+
+.agent-dashboard .agent-form-actions .delete-icon-btn svg {
+  stroke: #dc3545;
+  stroke-width: 2;
+}
+
+/* Hide the original delete button for agent role */
+.agent-dashboard .agent-form-actions + .delete-btn {
+  display: none;
+}
+
+/* Delete button is only shown in non-agent context */
+.agent-dashboard .delete-btn {
+  display: none;
+}
+
+/* Ensure proper spacing in form actions */
+.agent-dashboard .form-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Only apply special styling to agent-form-actions */
+.agent-dashboard .form-actions:not(.agent-form-actions) .cancel-btn,
+.agent-dashboard .form-actions:not(.agent-form-actions) .submit-btn {
+  /* Original styling preserved for non-agent-form-actions */
+  padding: 12px 20px;
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Keep submit btn prominent */
+.agent-dashboard .form-actions .submit-btn {
+  min-width: 120px;
+}
+
+/* Fix for the delete confirmation buttons */
+.delete-confirmation-actions .cancel-btn,
+.delete-confirmation-actions .delete-btn {
+  min-width: 120px;
+  flex: 1;
+  max-width: 150px;
+  text-align: center;
+  display: inline-block !important;
+  padding: 10px 15px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.delete-confirmation-actions .delete-btn {
+  background-color: #dc3545;
+  border: 1px solid #dc3545;
+  color: white;
+  display: inline-block !important;
+}
+
+.delete-confirmation-actions .delete-btn:hover {
+  background-color: #c82333;
+}
+
+.delete-confirmation-actions .cancel-btn {
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  color: #495057;
+}
+
+.delete-confirmation-actions .cancel-btn:hover {
+  background-color: #e9ecef;
+}
+
+/* Override agent-dashboard hiding rules */
+.agent-dashboard .delete-btn {
+  display: none;
+}
+
+/* But make sure confirmation modal buttons are visible */
+.agent-dashboard .delete-confirmation-actions .delete-btn {
+  display: inline-block !important;
+}
+
+/* Specific styles for delete confirmation modal buttons */
+.delete-confirmation-modal .cancel-btn,
+.delete-confirmation-modal .delete-btn {
+  min-width: 160px !important;
+  width: 220px !important;
+  flex: 0 0 120px !important;
+  text-align: center;
+  display: inline-block !important;
+  padding: 10px 15px !important;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.delete-confirmation-modal .delete-btn {
+  background-color: #dc3545 !important;
+  border: 1px solid #dc3545 !important;
+  color: white !important;
+}
+
+.delete-confirmation-modal .cancel-btn {
+  background-color: #f8f9fa !important;
+  border: 1px solid #ced4da !important;
+  color: #495057 !important;
+}
+
+.delete-confirmation-modal .delete-confirmation-actions {
+  justify-content: space-between !important;
+  padding: 16px 20px !important;
+}

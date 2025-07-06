@@ -1,0 +1,385 @@
+/* Global Styles */
+:root {
+  /* Main brand colors */
+  --primary-color: #1E513B;
+  --primary-hover: #164430;
+  --primary-light: #E7F2EE;
+  --secondary-color: #346854;
+  --accent-color: #4d9575;
+  
+  /* UI colors */
+  --background-color: #f9fafb;
+  --card-background: #ffffff;
+  --text-color: #111827;
+  --text-muted: #6b7280;
+  --error-color: #ef4444;
+  --success-color: #059669;
+  --border-color: #e5e7eb;
+  --border-radius: 0.375rem;
+  --box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  
+  /* Role-specific colors */
+  --agent-color: #1E513B;
+  --agent-light: #E7F2EE;
+  --agent-dark: #164430;
+  
+  --doctor-color: #0369a1;
+  --doctor-light: #e0f2fe;
+  --doctor-dark: #075985;
+  
+  --admin-color: #7c2d12;
+  --admin-light: #ffedd5;
+  --admin-dark: #9a3412;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
+    'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.5;
+}
+
+/* Form Styling */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: #fff;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30, 81, 59, 0.15);
+}
+
+/* Required field indicator styling */
+.required,
+.required-marker,
+.required-label,
+span[class*="required"] {
+  color: #ff0000 !important; /* Bright red color */
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* Additionally, add a helper class to directly target spans with asterisks */
+.form-field label > span,
+.form-group label > span {
+  color: inherit; /* Inherit color by default */
+}
+
+/* Override the color specifically for asterisks within these spans */
+.form-field label > span:only-child,
+.form-group label > span:only-child {
+  color: inherit; /* Keep normal color for spans that are the only content */
+}
+
+/* Target all asterisks in text content - a more general approach */
+label {
+  position: relative; /* For potential pseudo-element positioning */
+}
+
+/* Color any literal asterisk character within a label */
+label .asterisk,
+.field-label .asterisk {
+  color: #ff0000 !important;
+  font-weight: 600;
+}
+
+button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+button:hover {
+  background-color: var(--primary-hover);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  background-color: #75b798;
+  cursor: not-allowed;
+}
+
+/* Login Page Styling */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(135deg, #0d2b20 0%, #2d7659 100%);
+  padding: 2rem;
+  overflow: auto;
+}
+
+.login-form {
+  background-color: var(--card-background);
+  padding: 2.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  max-width: 450px;
+  position: relative;
+}
+
+.login-header {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.logo-container {
+  width: 250px;
+  height: auto;
+  margin: 0 auto;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.logo-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.error-message {
+  background-color: #fef2f2;
+  color: var(--error-color);
+  padding: 0.75rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  border-left: 4px solid var(--error-color);
+}
+
+.success-message {
+  background-color: #ecfdf5;
+  color: var(--success-color);
+  padding: 0.75rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  border-left: 4px solid var(--success-color);
+}
+
+/* Role-specific pages styling */
+.role-page {
+  min-height: 100vh;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.agent-page {
+  background: linear-gradient(135deg, #0f2f22 0%, #2d7659 100%);
+}
+
+.medecin-page {
+  background: linear-gradient(135deg, #075985 0%, #0ea5e9 100%);
+}
+
+.admin-page {
+  background: linear-gradient(135deg, #7c2d12 0%, #ea580c 100%);
+}
+
+.role-container {
+  background: white;
+  padding: 3rem;
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+.role-container h1 {
+  margin-bottom: 1.5rem;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.role-container p {
+  margin-bottom: 2rem;
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  line-height: 1.7;
+}
+
+.placeholder-icon {
+  margin-bottom: 2rem;
+  font-size: 4rem;
+  color: var(--text-muted);
+}
+
+.placeholder-icon svg {
+  color: var(--primary-color);
+  opacity: 0.7;
+}
+
+.medecin-page .placeholder-icon svg {
+  color: var(--doctor-color);
+}
+
+.admin-page .placeholder-icon svg {
+  color: var(--admin-color);
+}
+
+.logout-button {
+  background-color: #ef4444;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.logout-button:hover {
+  background-color: #dc2626;
+  transform: translateY(-2px);
+}
+
+.agent-content {
+  /* Styles for Agent-specific content will go here */
+}
+
+/* Utility Classes */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.rounded {
+  border-radius: 0.5rem;
+}
+
+.shadow {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.text-white {
+  color: white;
+}
+
+/* Animation for loading spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Global form error messages */
+.field-error-message {
+  color: var(--error-color);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.field-error-message::before {
+  content: '⚠️';
+  margin-right: 0.25rem;
+  font-size: 0.75rem;
+}
+
+/* Input validation error styling */
+input.validation-error,
+select.validation-error,
+textarea.validation-error {
+  border-color: var(--error-color) !important;
+  background-color: #fff8f8 !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+}
+
+/* Enhance form validation for select elements */
+select.validation-error {
+  border-color: var(--error-color) !important;
+  background-color: #fff8f8 !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ef4444' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+}
+
+/* Style for the placeholder option in validation error state */
+select.validation-error option:first-child {
+  color: var(--error-color);
+  font-weight: 500;
+}
+
+/* Global style for select-error class */
+.select-error {
+  border-color: var(--error-color) !important;
+  background-color: #fff8f8 !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3) !important;
+}

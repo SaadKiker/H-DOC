@@ -1,0 +1,425 @@
+.ordonnances-table-container {
+  width: 100%;
+  margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ordonnances-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+}
+
+.ordonnances-table thead th {
+  background-color: #e6e6e6; /* Darker grey background for header */
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 1px solid #e9ecef;
+  position: sticky;
+  top: 0;
+}
+
+.ordonnances-table tbody tr {
+  border-bottom: 1px solid #e9ecef;
+}
+
+.ordonnances-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.ordonnance-row {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.ordonnance-row:hover {
+  background-color: #f8f9fa;
+}
+
+.ordonnance-row.expanded {
+  background-color: #ffffff;
+  border-bottom: none;
+}
+
+.ordonnance-row.expanded:hover {
+  background-color: #ffffff;
+}
+
+.ordonnance-row td {
+  padding: 12px 16px;
+  color: #212529;
+}
+
+.chevron-cell {
+  text-align: center;
+  color: #6c757d;
+  width: 30px;
+}
+
+.voir-pdf-button {
+  background: none;
+  border: none;
+  color: #166534; /* Dark green color */
+  padding: 4px 0;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.voir-pdf-button:hover {
+  color: #14532d; /* Darker green on hover */
+  background: none;
+}
+
+.voir-pdf-button:focus {
+  outline: none;
+}
+
+/* Three dots menu styling */
+.actions-cell {
+  text-align: center;
+  position: relative;
+}
+
+.three-dots-menu-container {
+  position: relative;
+  display: inline-block;
+}
+
+.three-dots-button {
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.three-dots-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* No transform needed as the SVG already has vertical dots */
+.three-dots-icon {
+  /* vertical alignment is default */
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  z-index: 10;
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  width: 150px;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 15px;
+  border: none;
+  background: none;
+  font-size: 0.95rem;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.dropdown-item.delete-item {
+  color: #dc3545;
+}
+
+.dropdown-item.delete-item:hover {
+  background-color: #fff5f5;
+}
+
+/* Standard Modal styles from PatientProfile.css */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Extremely high z-index to ensure it's on top of everything */
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 0;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: modalAppear 0.3s ease-out;
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-title svg {
+  color: #f59e0b; /* Warning color */
+}
+
+.modal-title h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.close-modal-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #555;
+  display: flex;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.close-modal-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-body p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #444;
+}
+
+.modal-footer {
+  display: flex;
+  padding: 0;
+  margin: 0;
+  background-color: #f5f5f5;
+  border-top: 1px solid #e0e0e0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.modal-footer .cancel-btn,
+.modal-footer .submit-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+  border-radius: 0;
+  padding: 18px 0;
+  font-size: 15px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+  text-align: center;
+}
+
+.modal-footer .cancel-btn {
+  background-color: #f5f5f5;
+  color: #333;
+  border-right: 1px solid #e0e0e0;
+}
+
+.modal-footer .cancel-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.modal-footer .submit-btn {
+  background-color: #1E513B;
+  color: white;
+  font-weight: 500;
+}
+
+.modal-footer .submit-btn:hover {
+  background-color: #143c2b;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.status-badge.finalisée,
+.status-badge.finalisee,
+.status-badge.finalized {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.status-badge.en_cours,
+.status-badge.in_progress {
+  background-color: #cfe2ff;
+  color: #084298;
+}
+
+/* Expanded prescription styles */
+.prescriptions-row {
+  background-color: #f0f0f0; /* Slightly lighter grey than header, darker than white */
+}
+
+.prescriptions-container {
+  padding: 16px 24px 24px;
+}
+
+.prescriptions-container h4 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #495057;
+  font-size: 1rem;
+}
+
+/* New list style for prescriptions */
+.prescriptions-list {
+  margin-top: 12px;
+}
+
+.prescription-item {
+  padding: 10px;
+  line-height: 1.5;
+  color: #212529;
+  font-size: 0.95rem;
+  cursor: default;
+  background-color: transparent;
+  transition: none;
+}
+
+/* Add a specific rule to override any potential hover effects */
+.prescription-item:hover {
+  background-color: transparent;
+  transform: none;
+  box-shadow: none;
+  cursor: default;
+}
+
+.prescription-item:not(:last-child) {
+  border-bottom: 1px solid #e9ecef;
+}
+
+.no-prescriptions {
+  color: #6c757d;
+  font-style: italic;
+}
+
+.loading-container {
+  padding: 40px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.loading-text {
+  color: #6c757d;
+  font-size: 1rem;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid rgba(30, 81, 59, 0.1);
+  border-top-color: #1E513B;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  color: #dc3545;
+  padding: 16px;
+  text-align: center;
+  background-color: #f8d7da;
+  border-radius: 4px;
+  margin-top: 16px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #6c757d;
+  text-align: center;
+}
+
+.empty-state svg {
+  margin-bottom: 16px;
+  opacity: 0.7;
+}
+
+.empty-state p {
+  color: #6c757d;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.empty-state-sub-text {
+  font-size: 0.85rem !important;
+  margin-top: 0.5rem !important;
+  color: #adb5bd !important;
+}
+
+.table-info-header {
+  background-color: #f7f7f7;
+  padding: 8px 16px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.table-info-header p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #6c757d;
+} 

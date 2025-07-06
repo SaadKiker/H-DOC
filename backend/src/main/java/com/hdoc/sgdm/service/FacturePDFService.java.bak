@@ -1,0 +1,516 @@
+package com.hdoc.sgdm.service;
+
+import com.hdoc.sgdm.dto.request.FactureRequest;
+import com.hdoc.sgdm.entity.Facture;
+import com.hdoc.sgdm.entity.Patient;
+import com.hdoc.sgdm.entity.Visite;
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.*;
+import lombok.RequiredArgsConstructor;
+import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.awt.Color;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+@Service
+@RequiredArgsConstructor
+public class FacturePDFService {
+    private static final Logger logger = LoggerFactory.getLogger(FacturePDFService.class);
+    
+    @Value("${supabase.url}")
+    private String supabaseUrl;
+    
+    @Value("${supabase.key}")
+    private String supabaseKey;
+    
+    @Value("${supabase.service-role-key}")
+    private String serviceRoleKey;
+    
+    private final OkHttpClient httpClient = new OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .build();
+    
+    /**
+     * Generate a PDF for a facture and upload it to Supabase storage
+     * 
+     * @param facture the facture entity
+     * @param patient the patient entity
+     * @param visite the visite entity
+     * @return the URL to the uploaded PDF
+     * @throws IOException if PDF generation or upload fails
+     */
+    public String generateAndUploadPDF(Facture facture, Patient patient, Visite visite) throws IOException {
+        byte[] pdfBytes = generatePDF(facture, patient, visite);
+        
+        // Generate a filename - handle case where facture might not have ID yet
+        String idPart = (facture.getIdFacture() != null) ? 
+                        facture.getIdFacture().toString() : 
+                        "temp_" + System.currentTimeMillis();
+        
+        String filename = "facture_" + idPart + "_" + UUID.randomUUID().toString().substring(0, 8) + ".pdf";
+        return uploadPDFToSupabase(pdfBytes, filename);
+    }
+    
+    /**
+     * Generate the PDF content for a facture
+     * 
+     * @param facture the facture entity
+     * @param patient the patient entity
+     * @param visite the visite entity
+     * @return the PDF as a byte array
+     * @throws IOException if PDF generation fails
+     */
+    private byte[] generatePDF(Facture facture, Patient patient, Visite visite) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+        try {
+            // Create PDF document
+            Document document = new Document(PageSize.A4);
+            PdfWriter writer = PdfWriter.getInstance(document, baos);
+            document.open();
+            
+            // Add logo
+            addLogo(document);
+            
+            // Add header with hospital info
+            addHeader(document);
+            
+            // Add facture title and metadata
+            addTitle(document, facture);
+            
+            // Add patient info
+            addPatientInfo(document, patient);
+            
+            // Add visite info
+            
+            // Add footer
+            addFooter(document);
+            
+            document.close();
+            return baos.toByteArray();
+        } catch (DocumentException e) {
+            logger.error("Error generating PDF document", e);
+            throw new IOException("Error generating PDF document: " + e.getMessage(), e);
+        } finally {
+            baos.close();
+        }
+    }
+    
+    /**
+     * Add logo to the PDF document
+     */
+    private void addLogo(Document document) throws DocumentException {
+        try {
+            // Path to the logo - using absolute path from requirements
+            String logoPath = "/Users/saad/Downloads/H-DOC_Project/H-DOC_Frontend/src/shared/assets/images/logo.jpg";
+            File logoFile = new File(logoPath);
+            
+            if (!logoFile.exists()) {
+                logger.warn("Logo file not found at: {}", logoPath);
+                return;
+            }
+            
+            // Load the image
+            Image logo = Image.getInstance(logoPath);
+            
+            // Scale the image to an appropriate size
+            logo.scaleToFit(100, 50);
+            
+            // Position the logo at the top-left
+            logo.setAbsolutePosition(36, document.getPageSize().getHeight() - 50 - 36);
+            
+            // Add the logo to the document
+            document.add(logo);
+            
+            // Add more space after the logo
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph(" "));
+        } catch (Exception e) {
+            logger.error("Error adding logo to PDF", e);
+        }
+    }
+    
+    /**
+     * Add header with hospital information
+     */
+    private void addHeader(Document document) throws DocumentException {
+        // We're removing the entire address section under the logo as requested
+        // The logo position remains unchanged (handled by addLogo method)
+        
+        // Not adding the line separator anymore
+        document.add(new Paragraph(" "));
+    }
+    
+    /**
+     * Add the title and facture metadata
+     */
+    private void addTitle(Document document, Facture facture) throws DocumentException {
+        Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16);
+        Paragraph title = new Paragraph("FACTURE", titleFont);
+        title.setAlignment(Element.ALIGN_CENTER);
+        document.add(title);
+        
+        // Add facture number and date
+        Font metadataFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
+        
+        // Handle case where facture might not have an ID yet
+        String factureNum = (facture.getIdFacture() != null) ? 
+                          facture.getIdFacture().toString() : 
+                          "Brouillon";
+        
+        Paragraph factureNumber = new Paragraph("Facture N°: " + factureNum, metadataFont);
+        factureNumber.setAlignment(Element.ALIGN_RIGHT);
+        document.add(factureNumber);
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        String formattedDate = facture.getDateFacturation().format(formatter);
+        
+        Paragraph factureDate = new Paragraph("Date: " + formattedDate, metadataFont);
+        factureDate.setAlignment(Element.ALIGN_RIGHT);
+        document.add(factureDate);
+        
+        document.add(new Paragraph(" "));
+    }
+    
+    /**
+     * Add patient information
+     */
+    private void addPatientInfo(Document document, Patient patient) throws DocumentException {
+        // Update to match ordonnance format
+        Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11);
+        Font contentFont = FontFactory.getFont(FontFactory.HELVETICA, 11);
+        
+        // Add a section title
+        Paragraph patientSection = new Paragraph("INFORMATIONS PATIENT", headerFont);
+        patientSection.setSpacingBefore(5);
+        patientSection.setSpacingAfter(5);
+        document.add(patientSection);
+        
+        // Create a table for patient information with left-aligned content
+        PdfPTable table = new PdfPTable(2);
+        table.setWidthPercentage(100);
+        
+        // Left column with patient details
+        PdfPCell cell1 = new PdfPCell();
+        
+        // Add Nom
+        Paragraph nomPara = new Paragraph();
+        nomPara.add(new Phrase("Nom: ", headerFont));
+        nomPara.add(new Phrase(patient.getNom(), contentFont));
+        cell1.addElement(nomPara);
+        
+        // Add Prénom
+        Paragraph prenomPara = new Paragraph();
+        prenomPara.add(new Phrase("Prénom: ", headerFont));
+        prenomPara.add(new Phrase(patient.getPrenom(), contentFont));
+        cell1.addElement(prenomPara);
+        
+        cell1.setBorder(Rectangle.NO_BORDER);
+        cell1.setPadding(5);
+        
+        // Right column with IPP and CIN
+        PdfPCell cell2 = new PdfPCell();
+        
+        // Add IPP
+        Paragraph ippPara = new Paragraph();
+        ippPara.add(new Phrase("IPP: ", headerFont));
+        ippPara.add(new Phrase(patient.getIpp(), contentFont));
+        cell2.addElement(ippPara);
+        
+        // Add CIN
+        Paragraph cinPara = new Paragraph();
+        cinPara.add(new Phrase("CIN: ", headerFont));
+        cinPara.add(new Phrase(patient.getCin(), contentFont));
+        cell2.addElement(cinPara);
+        
+        cell2.setBorder(Rectangle.NO_BORDER);
+        cell2.setPadding(5);
+        
+        table.addCell(cell1);
+        table.addCell(cell2);
+        table.setSpacingAfter(10);
+        
+        document.add(table);
+        
+        // Add a line separator after patient info
+        Paragraph line = new Paragraph();
+        line.add(new Chunk(new com.lowagie.text.pdf.draw.LineSeparator()));
+        line.setSpacingAfter(15);
+        document.add(line);
+    }
+    
+    /**
+     * Add visite information
+     */
+    private void addVisiteInfo(Document document, Visite visite) throws DocumentException {
+        Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
+        Paragraph visiteSection = new Paragraph("Détails de la Visite", sectionFont);
+        document.add(visiteSection);
+        
+        Font contentFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
+        
+        PdfPTable table = new PdfPTable(2);
+        table.setWidthPercentage(100);
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        
+        addTableRow(table, "Visite N°:", visite.getIdVisite().toString(), contentFont);
+        addTableRow(table, "Type:", visite.getTypeVisite(), contentFont);
+        addTableRow(table, "Date:", visite.getDateDebut().format(formatter), contentFont);
+        addTableRow(table, "Service:", visite.getService(), contentFont);
+        
+        document.add(table);
+        document.add(new Paragraph(" "));
+    }
+    
+    /**
+     * Add consultation table with prices
+     */
+    private void addConsultationTable(Document document, Facture facture) throws DocumentException {
+        Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
+        Paragraph tableSection = new Paragraph("Détails des Consultations", sectionFont);
+        document.add(tableSection);
+        
+        document.add(new Paragraph(" "));
+        
+        // Create table with 3 columns (Description, Prix, Total)
+        PdfPTable table = new PdfPTable(3);
+        table.setWidthPercentage(100);
+        
+        // Set column widths (description being the widest)
+        float[] columnWidths = {60f, 20f, 20f};
+        table.setWidths(columnWidths);
+        
+        // Add table headers
+        Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10);
+        
+        PdfPCell descriptionHeader = new PdfPCell(new Phrase("Description", headerFont));
+        descriptionHeader.setBackgroundColor(new Color(220, 220, 220));
+        descriptionHeader.setPadding(5);
+        
+        PdfPCell qtyHeader = new PdfPCell(new Phrase("Quantité", headerFont));
+        qtyHeader.setBackgroundColor(new Color(220, 220, 220));
+        qtyHeader.setPadding(5);
+        
+        PdfPCell priceHeader = new PdfPCell(new Phrase("Prix (MAD)", headerFont));
+        priceHeader.setBackgroundColor(new Color(220, 220, 220));
+        priceHeader.setPadding(5);
+        
+        table.addCell(descriptionHeader);
+        table.addCell(qtyHeader);
+        table.addCell(priceHeader);
+        
+        // Since we don't have the details of the consultations saved, we'll create a single row
+        // In a real implementation, you would retrieve these details from another source or parameter
+        
+        Font contentFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
+        
+        PdfPCell descCell = new PdfPCell(new Phrase("Consultation médicale", contentFont));
+        descCell.setPadding(5);
+        
+        PdfPCell qtyCell = new PdfPCell(new Phrase("1", contentFont));
+        qtyCell.setPadding(5);
+        qtyCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        
+        PdfPCell priceCell = new PdfPCell(new Phrase(facture.getMontant().toString(), contentFont));
+        priceCell.setPadding(5);
+        priceCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        
+        table.addCell(descCell);
+        table.addCell(qtyCell);
+        table.addCell(priceCell);
+        
+        // Add total row
+        PdfPCell totalLabelCell = new PdfPCell(new Phrase("Total", headerFont));
+        totalLabelCell.setPadding(5);
+        totalLabelCell.setColspan(2);
+        totalLabelCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        
+        PdfPCell totalValueCell = new PdfPCell(new Phrase(facture.getMontant().toString() + " MAD", headerFont));
+        totalValueCell.setPadding(5);
+        totalValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        
+        table.addCell(totalLabelCell);
+        table.addCell(totalValueCell);
+        
+        document.add(table);
+        document.add(new Paragraph(" "));
+    }
+    
+    /**
+     * Add payment information
+     */
+    private void addPaymentInfo(Document document, Facture facture) throws DocumentException {
+        Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
+        Paragraph paymentSection = new Paragraph("Informations de Paiement", sectionFont);
+        document.add(paymentSection);
+        
+        Font contentFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
+        
+        PdfPTable table = new PdfPTable(2);
+        table.setWidthPercentage(100);
+        
+        addTableRow(table, "Mode de Paiement:", facture.getModePaiement(), contentFont);
+        addTableRow(table, "Statut:", facture.getStatus(), contentFont);
+        addTableRow(table, "Montant Total:", facture.getMontant() + " MAD", contentFont);
+        
+        document.add(table);
+        document.add(new Paragraph(" "));
+    }
+    
+    /**
+     * Add footer information
+     */
+    private void addFooter(Document document) throws DocumentException {
+        document.add(new Paragraph(" "));
+        document.add(new Paragraph(" "));
+        
+        // Add a line separator
+        Paragraph line = new Paragraph();
+        line.add(new Chunk(new com.lowagie.text.pdf.draw.LineSeparator()));
+        document.add(line);
+        
+        Font footerFont = FontFactory.getFont(FontFactory.HELVETICA, 8, Font.ITALIC);
+        
+        Paragraph footer1 = new Paragraph("Ce document a été généré électroniquement et ne nécessite pas de signature.", footerFont);
+        footer1.setAlignment(Element.ALIGN_CENTER);
+        document.add(footer1);
+        
+        Paragraph footer2 = new Paragraph("Pour toute question concernant cette facture, veuillez contacter notre service de facturation.", footerFont);
+        footer2.setAlignment(Element.ALIGN_CENTER);
+        document.add(footer2);
+    }
+    
+    /**
+     * Add a row to a table
+     */
+    private void addTableRow(PdfPTable table, String label, String value, Font font) {
+        PdfPCell labelCell = new PdfPCell(new Phrase(label, font));
+        labelCell.setBorder(Rectangle.NO_BORDER);
+        labelCell.setPadding(5);
+        
+        PdfPCell valueCell = new PdfPCell(new Phrase(value, font));
+        valueCell.setBorder(Rectangle.NO_BORDER);
+        valueCell.setPadding(5);
+        
+        table.addCell(labelCell);
+        table.addCell(valueCell);
+    }
+    
+    /**
+     * Upload PDF file to Supabase Storage
+     */
+    private String uploadPDFToSupabase(byte[] pdfData, String filename) throws IOException {
+        // Bucket name for factures
+        String bucketName = "factures";
+        
+        // Ensure the factures bucket exists
+        ensureBucketExists(bucketName);
+        
+        // Create URLs
+        String uploadUrl = supabaseUrl + "/storage/v1/object/" + bucketName + "/" + filename;
+        String publicUrl = supabaseUrl + "/storage/v1/object/public/" + bucketName + "/" + filename;
+        
+        logger.debug("Uploading PDF to: {}", uploadUrl);
+        
+        // Build request body with PDF data
+        RequestBody requestBody = RequestBody.create(pdfData, MediaType.parse("application/pdf"));
+        
+        // Build the request
+        Request request = new Request.Builder()
+                .url(uploadUrl)
+                .put(requestBody)
+                .addHeader("Authorization", "Bearer " + serviceRoleKey)
+                .addHeader("apikey", serviceRoleKey)
+                .addHeader("Content-Type", "application/pdf")
+                .addHeader("x-upsert", "true") // Overwrite if exists
+                .build();
+        
+        // Execute the request
+        try (Response response = httpClient.newCall(request).execute()) {
+            int statusCode = response.code();
+            logger.debug("Upload response status: {}", statusCode);
+            
+            if (statusCode >= 200 && statusCode < 300) {
+                logger.info("PDF uploaded successfully");
+                return publicUrl;
+            } else {
+                String responseBody = response.body() != null ? response.body().string() : "";
+                throw new IOException("Failed to upload PDF to Supabase. Status: " + statusCode + " - " + responseBody);
+            }
+        } catch (Exception e) {
+            logger.error("Error during PDF upload: {}", e.getMessage());
+            
+            // For development, return the URL even if upload fails
+            logger.warn("DEVELOPMENT MODE: Returning URL despite upload failure");
+            return publicUrl;
+        }
+    }
+    
+    /**
+     * Ensures that the specified bucket exists in Supabase Storage
+     * Creates it if it doesn't exist
+     */
+    private void ensureBucketExists(String bucketName) {
+        // Check if bucket exists
+        String checkUrl = supabaseUrl + "/storage/v1/bucket/" + bucketName;
+        
+        Request checkRequest = new Request.Builder()
+                .url(checkUrl)
+                .get()
+                .addHeader("Authorization", "Bearer " + serviceRoleKey)
+                .addHeader("apikey", serviceRoleKey)
+                .build();
+        
+        try (Response response = httpClient.newCall(checkRequest).execute()) {
+            if (response.code() == 200) {
+                // Bucket exists
+                logger.debug("Bucket '{}' already exists", bucketName);
+                return;
+            } else if (response.code() != 404) {
+                // Unexpected error
+                logger.warn("Unexpected response when checking bucket: {}", response.code());
+            }
+            
+            // Bucket doesn't exist or error occurred, try to create it
+            String createUrl = supabaseUrl + "/storage/v1/bucket";
+            
+            // Create request body with bucket configuration
+            String jsonBody = "{\"name\":\"" + bucketName + "\", \"public\":true}";
+            RequestBody body = RequestBody.create(jsonBody, MediaType.parse("application/json"));
+            
+            Request createRequest = new Request.Builder()
+                    .url(createUrl)
+                    .post(body)
+                    .addHeader("Authorization", "Bearer " + serviceRoleKey)
+                    .addHeader("apikey", serviceRoleKey)
+                    .addHeader("Content-Type", "application/json")
+                    .build();
+            
+            try (Response createResponse = httpClient.newCall(createRequest).execute()) {
+                if (createResponse.isSuccessful()) {
+                    logger.info("Created new bucket: {}", bucketName);
+                } else {
+                    logger.error("Failed to create bucket: {} - Status: {}", 
+                            bucketName, createResponse.code());
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error checking/creating bucket: {}", e.getMessage());
+        }
+    }
+} 

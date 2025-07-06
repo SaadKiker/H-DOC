@@ -1,0 +1,200 @@
+.allergies-table-container {
+  width: 100%;
+  margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.allergies-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+}
+
+.allergies-table thead th {
+  background-color: #e6e6e6; /* Darker grey background for header */
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 1px solid #e9ecef;
+  position: sticky;
+  top: 0;
+}
+
+.allergies-table tbody tr {
+  border-bottom: 1px solid #e9ecef;
+}
+
+.allergies-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.allergy-row {
+  transition: background-color 0.2s;
+}
+
+.allergy-row:hover {
+  background-color: #f8f9fa;
+}
+
+.allergy-row td {
+  padding: 12px 16px;
+  color: #212529;
+}
+
+.loading-container {
+  padding: 40px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid rgba(30, 81, 59, 0.1);
+  border-top-color: #1E513B;
+  animation: spin 1s linear infinite;
+}
+
+.loading-container p {
+  color: #666;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  color: #721c24;
+  padding: 20px;
+  text-align: center;
+  background-color: #f8d7da;
+  border-radius: 8px;
+  margin-top: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.error-message p {
+  margin: 8px 0;
+}
+
+.error-message .error-details {
+  color: #555;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.retry-button {
+  background-color: #1E513B;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  margin-top: 10px;
+}
+
+.retry-button:hover {
+  background-color: #143c2b;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #6c757d;
+  text-align: center;
+}
+
+.empty-state svg {
+  margin-bottom: 16px;
+  opacity: 0.7;
+}
+
+.empty-state p {
+  color: #6c757d;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Three dots menu styling */
+.actions-cell {
+  text-align: center;
+  position: relative;
+}
+
+.three-dots-menu-container {
+  position: relative;
+  display: inline-block;
+}
+
+.three-dots-button {
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.three-dots-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 100%;
+  top: 0;
+  z-index: 10;
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  width: 150px;
+  overflow: hidden;
+  margin-right: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 15px;
+  border: none;
+  background: none;
+  font-size: 0.95rem;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.dropdown-item.delete-item {
+  color: #dc3545;
+}
+
+.dropdown-item.delete-item:hover {
+  background-color: #fff5f5;
+} 

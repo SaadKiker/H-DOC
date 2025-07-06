@@ -1,0 +1,4308 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../auth/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
+import axios from '../shared/api/axios';
+import { API_ENDPOINTS } from '../shared/api/api.config';
+import { 
+  Patient, 
+  PatientSearchResponse, 
+  Visit, 
+  CompletedVisitsResponse,
+  UpcomingAppointmentsResponse,
+  Doctor,
+  RendezVousStatus,
+  Appointment
+  } from './types';
+  import AppointmentForm from './AppointmentForm';
+  import PatientCreation from '../patient/PatientCreation';
+  import PatientEdit from '../patient/PatientEdit';
+  import AppointmentsCalendar from './AppointmentsCalendar';
+  import './Dashboard.css';
+  import { cleanConsultationTitle } from '../shared/utils/stringUtils';
+
+  // Modify the doctorTableStyles to include general styles for all dashboard tables
+  const doctorTableStyles = `
+    /* Specific styles for doctor dashboard */
+    .medecin-dashboard .visits-table tr {
+      height: 2.8rem;
+      transition: none;
+    }
+    .medecin-dashboard .visits-table tbody tr:hover {
+      background-color: transparent;
+      cursor: default;
+    }
+    
+    /* General styles for both dashboards */
+    .upcoming-visits-section .visits-table tr {
+      height: 2.8rem;
+    }
+  `;
+
+  // SVG Icon components
+  const CloseIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  );
+
+  const SearchIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+  );
+
+  const RefreshIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="1 4 1 10 7 10"></polyline>
+      <polyline points="23 20 23 14 17 14"></polyline>
+      <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+    </svg>
+  );
+
+  const ThreeDotsIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="1.5"></circle>
+      <circle cx="12" cy="5" r="1.5"></circle>
+      <circle cx="12" cy="19" r="1.5"></circle>
+    </svg>
+  );
+
+  const EditIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+    </svg>
+  );
+
+  const DeleteIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3 6 5 6 21 6"></polyline>
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+      <line x1="10" y1="11" x2="10" y2="17"></line>
+      <line x1="14" y1="11" x2="14" y2="17"></line>
+    </svg>
+  );
+
+  const AddUserIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+      <circle cx="8.5" cy="7" r="4"></circle>
+      <line x1="20" y1="8" x2="20" y2="14"></line>
+      <line x1="23" y1="11" x2="17" y2="11"></line>
+    </svg>
+  );
+
+  const UserIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+  );
+
+  const CircleUserIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <circle cx="12" cy="9" r="3"></circle>
+      <path d="M6.5 19c1.5-2 3.5-3 5.5-3s4 1 5.5 3"></path>
+    </svg>
+  );
+
+  const NotesIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+    </svg>
+  );
+
+  const HospitalIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1E513B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+      <line x1="9" y1="3" x2="9" y2="21"></line>
+      <line x1="15" y1="3" x2="15" y2="21"></line>
+      <line x1="3" y1="9" x2="21" y2="9"></line>
+      <line x1="3" y1="15" x2="21" y2="15"></line>
+    </svg>
+  );
+
+  const ReceiptIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1E513B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 2v20l4-4 4 4 4-4 4 4V2"></path>
+      <path d="M16 8h-8"></path>
+      <path d="M16 12h-8"></path>
+      <path d="M12 16h-4"></path>
+    </svg>
+  );
+
+  const ClipboardsIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#aaaaaa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="3" width="6" height="9"></rect>
+      <rect x="5" y="6" width="14" height="15" rx="2"></rect>
+      <line x1="9" y1="13" x2="15" y2="13"></line>
+      <line x1="9" y1="17" x2="15" y2="17"></line>
+    </svg>
+  );
+
+  // Right Arrow Icon for Panels
+  const RightArrowIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 18l6-6-6-6"/>
+    </svg>
+  );
+
+  // Invoice Icon
+  const InvoiceIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#aaaaaa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+      <polyline points="14 2 14 8 20 8"></polyline>
+      <line x1="16" y1="13" x2="8" y2="13"></line>
+      <line x1="16" y1="17" x2="8" y2="17"></line>
+      <polyline points="10 9 9 9 8 9"></polyline>
+    </svg>
+  );
+
+  // Interface for Consultation data
+  interface Consultation {
+    id: string;
+    nomModele: string;
+    dateRemplissage: string;
+    nomMedecin?: string;
+    prix?: number;
+  }
+
+  // Interface for visit data
+  interface VisitData {
+    idVisite: number;
+    dateDebut: string;
+  }
+
+  // Create Toast hook
+  const useToast = () => {
+    const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+      // Check if the toast container already exists, otherwise create it
+      let toastContainer = document.querySelector('.notification-container') as HTMLDivElement | null;
+      
+      if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.className = 'notification-container';
+        toastContainer.style.position = 'fixed';
+        toastContainer.style.bottom = '20px';
+        toastContainer.style.left = '20px';
+        toastContainer.style.zIndex = '9999';
+        document.body.appendChild(toastContainer);
+      }
+      
+      // Create the notification element
+      const toast = document.createElement('div');
+      toast.className = 'notification';
+      toast.style.backgroundColor = type === 'success' ? '#dff2bf' : '#ffbaba';
+      toast.style.color = type === 'success' ? '#4F8A10' : '#D8000C';
+      toast.style.padding = '10px 15px';
+      toast.style.borderRadius = '5px';
+      toast.style.marginBottom = '10px';
+      toast.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+      toast.style.display = 'flex';
+      toast.style.alignItems = 'center';
+      toast.style.fontWeight = '500';
+      toast.style.fontSize = '14px';
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(20px)';
+      toast.style.transition = 'all 0.3s ease-in-out';
+      
+      // Add icon based on type
+      const icon = document.createElement('span');
+      icon.style.marginRight = '10px';
+      icon.innerHTML = type === 'success' 
+        ? '✓' // Check mark for success
+        : '✕'; // X mark for error
+      icon.style.fontWeight = 'bold';
+      icon.style.fontSize = '16px';
+      
+      // Create message container
+      const messageSpan = document.createElement('span');
+      messageSpan.innerHTML = message;
+      
+      // Assemble the notification
+      toast.appendChild(icon);
+      toast.appendChild(messageSpan);
+      
+      // Add to container
+      toastContainer.appendChild(toast);
+      
+      // Animate in
+      setTimeout(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+      }, 10);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          if (toastContainer.contains(toast)) {
+            toastContainer.removeChild(toast);
+          }
+        }, 300);
+      }, 3000);
+    };
+    
+    return { showToast };
+  };
+
+  // Facture Panel Component
+  interface FacturePanelProps {
+    isOpen: boolean;
+    onClose: () => void;
+    patientId: string;
+    patientIPP: string;
+    onFactureAdded?: () => void;
+  }
+
+  const FacturePanel = ({ isOpen, onClose, patientId, patientIPP, onFactureAdded }: FacturePanelProps) => {
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [consultations, setConsultations] = useState<Consultation[]>([]);
+    const [latestVisit, setLatestVisit] = useState<number | null>(null);
+    const { showToast } = useToast();
+    const [modePaiement, setModePaiement] = useState<string>('');
+    const [submitting, setSubmitting] = useState<boolean>(false);
+    const [generatingPdf, setGeneratingPdf] = useState<boolean>(false);
+    const [factureId, setFactureId] = useState<string | null>(null);
+    const [attempted, setAttempted] = useState<boolean>(false);
+
+    // Format date for display
+    const formatDateTime = (dateString: string): string => {
+      if (!dateString) return "--";
+      
+      const date = new Date(dateString);
+      return date.toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    };
+
+    // Calculate total amount based on prix values from API
+    const calculateTotal = (): number => {
+      return consultations.reduce((sum, consultation) => {
+        return sum + (consultation.prix || 0);
+      }, 0);
+    };
+
+    // Check if form is valid
+    const isFormValid = (): boolean => {
+      // Check if all consultations have valid prices
+      const allPricesValid = consultations.every(consultation => {
+        return consultation.prix !== undefined && consultation.prix > 0;
+      });
+      
+      // Check if payment method is selected
+      return allPricesValid && !!modePaiement;
+    };
+
+    // Handle facture creation
+    const handleCreateFacture = async () => {
+      if (!isFormValid() || !patientId || !latestVisit) {
+        setAttempted(true);
+        return;
+      }
+      
+      setSubmitting(true);
+      
+      try {
+        // Create array of consultation details
+        const consultationsData = consultations.map(consultation => ({
+          description: consultation.nomModele,
+          prix: consultation.prix || 0
+        }));
+        
+        // Create the facture with a single POST request
+        const response = await axios.post(API_ENDPOINTS.FACTURES.CREATE, {
+          idVisite: latestVisit,
+          modePaiement: modePaiement,
+          status: 'Payé',
+          consultations: consultationsData // Add consultation details
+        });
+        
+        // Save the facture ID for the PDF generation
+        setFactureId(response.data.idFacture);
+        
+        // Show success message
+        showToast('Facture enregistrée avec succès', 'success');
+        
+        // Refresh the parent component
+        if (onFactureAdded) {
+          onFactureAdded();
+        }
+        
+        // Close the panel
+        onClose();
+        
+        setSubmitting(false);
+      } catch (err) {
+        console.error('Erreur lors de la création de la facture:', err);
+        showToast('Erreur lors de la création de la facture', 'error');
+        setSubmitting(false);
+      }
+    };
+    
+    // Handle facture creation and close visit
+    const handleCreateFactureAndCloseVisit = async () => {
+      if (!isFormValid() || !patientId || !latestVisit) {
+        setAttempted(true);
+        return;
+      }
+      
+      setSubmitting(true);
+      
+      try {
+        // Create array of consultation details
+        const consultationsData = consultations.map(consultation => ({
+          description: consultation.nomModele,
+          prix: consultation.prix || 0
+        }));
+        
+        // Create the facture with a single POST request
+        const response = await axios.post('/api/factures', {
+          idVisite: latestVisit,
+          modePaiement: modePaiement,
+          status: 'payé',
+          consultations: consultationsData // Add consultation details
+        });
+        
+        // Save the facture ID for the PDF generation
+        setFactureId(response.data.idFacture);
+        
+        // Show success message
+        showToast('Facture enregistrée', 'success');
+        
+        // After successful facture creation, close the visit
+        try {
+          // Make a POST request to end the visit
+          // Include flag to update the linked rendez-vous status to COMPLETE
+          await axios.post(`/api/visites/${latestVisit}/end`, {
+            updateRendezVousStatus: true,
+            rendezVousStatus: RendezVousStatus.COMPLETE
+          });
+          showToast('Visite clôturée', 'success');
+        } catch (closeError) {
+          console.error('Erreur lors de la clôture de la visite:', closeError);
+          showToast('Erreur lors de la clôture de la visite', 'error');
+        }
+        
+        // Refresh both "Factures en attente" and "Factures du jour" tables
+        if (onFactureAdded) {
+          onFactureAdded();
+        }
+        
+        // Close the panel
+        onClose();
+      } catch (err) {
+        console.error('Erreur lors de la création de la facture:', err);
+        showToast('Erreur lors de la création de la facture', 'error');
+      } finally {
+        setSubmitting(false);
+      }
+    };
+
+    // Handle generating PDF
+    const handleGeneratePdf = async () => {
+      if (!isFormValid() || !patientId || !latestVisit) {
+        setAttempted(true);
+        return;
+      }
+      
+      // If we already have a facture ID, use it to generate PDF
+      // Otherwise, create the facture first
+      if (!factureId) {
+        setSubmitting(true);
+        
+        try {
+          // Create array of consultation details
+          const consultationsData = consultations.map(consultation => ({
+            description: consultation.nomModele,
+            prix: consultation.prix || 0
+          }));
+          
+          // Create the facture with a single POST request
+          const createResponse = await axios.post(API_ENDPOINTS.FACTURES.CREATE, {
+            idVisite: latestVisit,
+            modePaiement: modePaiement,
+            status: 'Payé',
+            consultations: consultationsData // Add consultation details
+          });
+          
+          // Save the facture ID for the PDF generation
+          setFactureId(createResponse.data.idFacture);
+          setSubmitting(false);
+          
+          // Continue to generate PDF with the new facture ID
+          generatePdf(createResponse.data.idFacture);
+        } catch (err) {
+          console.error('Erreur lors de la création de la facture:', err);
+          showToast('Erreur lors de la création de la facture', 'error');
+          setSubmitting(false);
+          return;
+        }
+      } else {
+        // Use existing facture ID to generate PDF
+        generatePdf(factureId);
+      }
+    };
+
+    // Generate PDF helper function
+    const generatePdf = async (id: string) => {
+      setGeneratingPdf(true);
+      
+      try {
+        // Use the endpoint to generate the PDF - CHANGED FROM GET TO POST
+        const response = await axios.post(API_ENDPOINTS.FACTURES.GENERATE_PDF_BY_ID(id));
+        
+        // Handle the URL in the response
+        if (response.data?.url) {
+          // Open the URL in a new tab
+          window.open(response.data.url, '_blank');
+          
+          // Refresh the parent component
+          if (onFactureAdded) {
+            onFactureAdded();
+          }
+          
+          showToast('PDF généré avec succès', 'success');
+          
+          // Automatically close the panel after successful PDF generation
+          onClose();
+        } else {
+          // If no URL in response, show error message
+          console.error('Erreur: Aucune URL de PDF dans la réponse');
+          showToast('Erreur lors de la génération du PDF', 'error');
+        }
+      } catch (err) {
+        console.error('Erreur lors de la génération du PDF:', err);
+        showToast('PDF non généré', 'error');
+      } finally {
+        setGeneratingPdf(false);
+      }
+    };
+
+      // Fetch the latest visit when the panel opens
+  useEffect(() => {
+    if (isOpen && patientId) {
+      const fetchLatestVisit = async () => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+          // Use the factures endpoint that was working before
+          const facturesResponse = await axios.get(API_ENDPOINTS.FACTURES.GET_BY_PATIENT(patientId));
+          console.log("Factures response:", facturesResponse.data);
+          
+          if (facturesResponse.data && Array.isArray(facturesResponse.data) && facturesResponse.data.length > 0) {
+            // DIFFERENT APPROACH: Instead of using first facture, look for the most recent one
+            const sortedFactures = facturesResponse.data.sort((a, b) => {
+              // Try to sort by facture date if available
+              if (a.dateCreation && b.dateCreation) {
+                return new Date(b.dateCreation).getTime() - new Date(a.dateCreation).getTime();
+              }
+              // Otherwise sort by ID (assuming higher ID = more recent)
+              return b.idFacture - a.idFacture;
+            });
+            
+            if (sortedFactures[0].idVisite) {
+              console.log("Using visit ID from most recent facture:", sortedFactures[0].idVisite);
+              setLatestVisit(sortedFactures[0].idVisite);
+            } else {
+              setError("Aucune visite trouvée dans les factures");
+              setLoading(false);
+            }
+          } else {
+            setError("Aucune facture trouvée pour ce patient");
+            setLoading(false);
+          }
+        } catch (err) {
+          console.error("Erreur lors de la récupération des factures:", err);
+          setError("Erreur lors de la récupération des factures");
+          setLoading(false);
+        }
+      };
+
+      fetchLatestVisit();
+    }
+  }, [isOpen, patientId]);
+
+    // Fetch consultations when the latestVisit is set
+    useEffect(() => {
+      if (latestVisit && isOpen) {
+        const fetchConsultations = async () => {
+          try {
+                      // Use the correct endpoint for consultations
+          const response = await axios.get(`/api/formulaires/visite/${latestVisit}`);
+            
+            if (response.data && Array.isArray(response.data)) {
+              setConsultations(response.data);
+            } else if (response.data && Array.isArray(response.data.consultations)) {
+              setConsultations(response.data.consultations);
+            } else {
+              setConsultations([]);
+            }
+            
+            setLoading(false);
+          } catch (err) {
+            console.error("Erreur lors de la récupération des consultations:", err);
+            setError("Erreur lors de la récupération des consultations");
+            setLoading(false);
+          }
+        };
+        
+        fetchConsultations();
+      }
+    }, [latestVisit, isOpen]);
+
+    return (
+      <div className={`sliding-panel ${isOpen ? 'open' : ''}`}>
+        <div className="sliding-panel-content">
+          <div className="forms-panel-header">
+            <h3>Créer une nouvelle facture</h3>
+            <button className="panel-close-button" onClick={onClose}>
+              <RightArrowIcon />
+            </button>
+          </div>
+          <div className="panel-content">
+            {loading ? (
+              <div className="loading-state">
+                <div className="spinner"></div>
+                <p>Chargement des consultations...</p>
+              </div>
+            ) : error ? (
+              <div className="error-state">
+                <p>{error}</p>
+              </div>
+            ) : consultations.length === 0 ? (
+              <div className="empty-state">
+                <InvoiceIcon />
+                <p>Aucune consultation n'a été trouvée pour la dernière visite.</p>
+              </div>
+            ) :
+              <div className="facture-consultations-list">
+                {consultations.map((consultation) => (
+                  <div key={consultation.id} className="consultation-card">
+                    <div className="consultation-header">
+                      <h4 className="consultation-title">{cleanConsultationTitle(consultation.nomModele)}</h4>
+                    </div>
+                    <div className="consultation-details">
+                      <div className="consultation-meta">
+                        <div className="meta-item">
+                          <span className="meta-label">Date:</span>
+                          <span className="meta-value">{formatDateTime(consultation.dateRemplissage)}</span>
+                        </div>
+                        <div className="meta-item">
+                          <span className="meta-label">Médecin:</span>
+                          <span className="meta-value">{consultation.nomMedecin || 'Non spécifié'}</span>
+                        </div>
+                      </div>
+                      <div className="consultation-price">
+                        <span className="meta-label">Prix:</span>
+                        <span className="price-value">{consultation.prix?.toFixed(2) || '0.00'} MAD</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                
+                <div className="facture-total">
+                  <div className="total-label">Total:</div>
+                  <div className="total-amount">{calculateTotal().toFixed(2)} MAD</div>
+                </div>
+                
+                <div className="payment-method">
+                  <label htmlFor="payment-method">Mode de paiement</label>
+                  <select 
+                    id="payment-method" 
+                    value={modePaiement} 
+                    onChange={(e) => setModePaiement(e.target.value)}
+                    required
+                    className={attempted && !modePaiement ? 'input-error' : ''}
+                  >
+                    <option value="">-- Sélectionnez un mode de paiement --</option>
+                    <option value="Espèce">Espèce</option>
+                    <option value="Carte bancaire">Carte bancaire</option>
+                    <option value="Chèque">Chèque</option>
+                  </select>
+                  {attempted && !modePaiement && (
+                    <div className="error-message">Veuillez sélectionner un mode de paiement</div>
+                  )}
+                </div>
+              </div>
+            }
+          </div>
+          
+          {!loading && !error && consultations.length > 0 && (
+            <div className="facture-panel-footer" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '20px' }}>
+                <button 
+                  className="submit-btn"
+                  onClick={handleCreateFacture}
+                  disabled={!isFormValid() || submitting || generatingPdf}
+                >
+                  {submitting ? (
+                    <React.Fragment key="submitting">
+                      <span className="button-spinner"></span>
+                      <span>Enregistrement...</span>
+                    </React.Fragment>
+                  ) : (
+                    "Enregistrer"
+                  )}
+                </button>
+                <button 
+                  className="generate-pdf-btn"
+                  onClick={handleGeneratePdf}
+                  disabled={!isFormValid() || generatingPdf}
+                >
+                  {generatingPdf ? (
+                    <React.Fragment key="generating">
+                      <span className="button-spinner"></span>
+                      <span>Génération en cours...</span>
+                    </React.Fragment>
+                  ) : (
+                    "Générer PDF"
+                  )}
+                </button>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '20px' }}>
+                <button 
+                  className="submit-btn"
+                  style={{ 
+                    flex: '1', 
+                    backgroundColor: '#2c62e8', 
+                    borderColor: '#2c62e8'
+                  }}
+                  onClick={handleCreateFactureAndCloseVisit}
+                  disabled={!isFormValid() || submitting || generatingPdf}
+                >
+                  {submitting ? (
+                    <React.Fragment key="submitting-close">
+                      <span className="button-spinner"></span>
+                      <span>Traitement en cours...</span>
+                    </React.Fragment>
+                  ) : (
+                    "Enregistrer et clôturer la visite"
+                  )}
+                </button>
+                <button 
+                  className="cancel-btn"
+                  onClick={onClose}
+                  disabled={submitting || generatingPdf}
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Visit types constant for the StartVisitForm
+  const VISIT_TYPES = [
+    { id: 'CONSULTATION', label: 'Consultation' },
+    { id: 'SUIVI', label: 'Suivi' },
+    { id: 'CONTROLE', label: 'Contrôle' }
+  ];
+
+  // Start Visit Form Component
+  interface StartVisitFormProps {
+    isOpen: boolean;
+    onClose: () => void;
+    patientIPP: string;
+    onSuccess: () => void;
+    selectedVisit?: Visit; // Add optional selectedVisit parameter
+  }
+
+  const StartVisitForm = ({ isOpen, onClose, patientIPP, onSuccess, selectedVisit }: StartVisitFormProps) => {
+    const [date, setDate] = useState<string>(() => {
+      const today = new Date();
+      return today.toISOString().split('T')[0]; // YYYY-MM-DD format
+    });
+    
+    const [time, setTime] = useState<string>(() => {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    });
+    
+    const [selectedVisitType, setSelectedVisitType] = useState<string>('');
+    const [service, setService] = useState<string>('Consultation Générale');
+    const [idMedecin, setIdMedecin] = useState<string | null>(null);
+    const [doctors, setDoctors] = useState<Doctor[]>([]);
+    const [isLoadingDoctors, setIsLoadingDoctors] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+    
+    // Reset form on open
+    useEffect(() => {
+      if (isOpen) {
+        if (selectedVisit) {
+          // Pre-fill form with selectedVisit data if available
+          const visitDate = new Date(selectedVisit.dateDebut);
+          setDate(visitDate.toISOString().split('T')[0]);
+          
+          const hours = String(visitDate.getHours()).padStart(2, '0');
+          const minutes = String(visitDate.getMinutes()).padStart(2, '0');
+          setTime(`${hours}:${minutes}`);
+          
+          setSelectedVisitType(selectedVisit.typeVisite || '');
+          setService(selectedVisit.service || 'Consultation Générale');
+          
+          if (selectedVisit.medecin?.idMedecin) {
+            setIdMedecin(selectedVisit.medecin.idMedecin);
+          }
+        } else {
+          // Default values if no selectedVisit
+          const now = new Date();
+          setDate(now.toISOString().split('T')[0]);
+          const hours = String(now.getHours()).padStart(2, '0');
+          const minutes = String(now.getMinutes()).padStart(2, '0');
+          setTime(`${hours}:${minutes}`);
+          setSelectedVisitType('');
+          setService('Consultation Générale'); // Default service value
+          setIdMedecin(null);
+        }
+        setError(null);
+        fetchDoctors();
+      }
+    }, [isOpen, selectedVisit]);
+    
+    // Fetch doctors for selection
+    const fetchDoctors = async () => {
+      try {
+        setIsLoadingDoctors(true);
+        const response = await axios.get(API_ENDPOINTS.DOCTORS.GET_ALL);
+        
+        if (response.data && response.data.medecins) {
+          setDoctors(response.data.medecins);
+        } else {
+          setDoctors([]);
+        }
+      } catch (error) {
+        console.error('Error fetching doctors:', error);
+        setError('Impossible de récupérer la liste des médecins.');
+      } finally {
+        setIsLoadingDoctors(false);
+      }
+    };
+    
+    // No filtering needed anymore
+    const filteredVisitTypes = VISIT_TYPES;
+    
+    // Submit handler
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      
+      // Validate form
+      if (!selectedVisitType) {
+        setError('Veuillez sélectionner un type de visite');
+        return;
+      }
+      
+      // Combine date and time
+      const dateTime = new Date(`${date}T${time}`);
+      
+      if (isNaN(dateTime.getTime())) {
+        setError('Date ou heure invalide');
+        return;
+      }
+      
+      setIsSubmitting(true);
+      setError(null);
+      
+      // Extract the appointment ID from the selected visit
+      const rawAppointmentId = selectedVisit?.idVisite;
+      
+      console.log('Selected visit:', selectedVisit);
+      console.log('Raw appointment ID:', rawAppointmentId);
+      
+          // Create basic payload with proper typing to allow dynamic properties
+    const payload: {
+      typeVisite: string;
+      commentaire: string;
+      motif: string;
+      service: string;
+      dateDebut: string;
+      idMedecin?: string;
+      idRdv?: number;
+      idRendezVous?: string | number;
+      updateRendezVousStatus?: boolean;
+      rendezVousStatus?: string;
+    } = {
+      typeVisite: selectedVisitType,
+      commentaire: "Visite démarrée",
+      motif: "Visite démarrée", // Add motif field as required by the backend
+      service: service.trim(),
+      dateDebut: dateTime.toISOString()
+    };
+      
+      // Add doctor ID if selected
+      if (idMedecin) {
+        payload.idMedecin = idMedecin;
+      }
+      
+      // Add appointment ID if available - try multiple field names based on the backend expectation
+      if (rawAppointmentId) {
+        // Field name from the backend implementation
+        payload.idRdv = rawAppointmentId;
+        
+        // Also try the field name that's used in the response mapping
+        payload.idRendezVous = rawAppointmentId;
+        
+        // Add flag to update the rendez-vous status to EN_COURS
+        payload.updateRendezVousStatus = true;
+        payload.rendezVousStatus = RendezVousStatus.EN_COURS;
+      }
+      
+      console.log('Starting visit with payload:', payload);
+      console.log('Endpoint:', API_ENDPOINTS.VISITS.CREATE(patientIPP));
+      
+      try {
+        const response = await axios.post(API_ENDPOINTS.VISITS.CREATE(patientIPP), payload);
+        console.log('Start visit response:', response.data);
+        
+        // Check if the visit was created from an appointment
+        if (response.data?.fromAppointment) {
+          console.log('Visit created from appointment:', response.data?.rendezVous);
+        }
+        
+        // Success
+        onSuccess();
+        onClose();
+      } catch (error: any) {
+        console.error('Error starting visit:', error);
+        
+        // Log more detail about the error
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.error('Error response data:', JSON.stringify(error.response.data, null, 2));
+          console.error('Error response status:', error.response.status);
+          console.error('Error response headers:', error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.error('Error request:', error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.error('Error message:', error.message);
+        }
+        
+        setError(error.response?.data?.message || 'Une erreur est survenue lors du démarrage de la visite');
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+    
+    return (
+      <>
+        {/* Overlay for the sliding panel */}
+        <div 
+          className={`sliding-panel-overlay ${isOpen ? 'visible' : ''}`}
+          onClick={onClose}
+        />
+        
+        {/* Sliding panel */}
+        <div className={`sliding-panel ${isOpen ? 'open' : ''}`}>
+          <div className="sliding-panel-content">
+            <div className="sliding-panel-header">
+              <h2>Démarrer une visite</h2>
+              <button className="close-panel-button" onClick={onClose}>
+                <CloseIcon />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="visit-form">
+              {error && (
+                <div className="error-message">
+                  {error}
+                </div>
+              )}
+              
+              <div className="form-section">
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="visit-date">Date</label>
+                    <div className="input-with-icon">
+                      <input 
+                        type="date" 
+                        id="visit-date" 
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="visit-time">Heure</label>
+                    <div className="input-with-icon">
+                      <input 
+                        type="time" 
+                        id="visit-time" 
+                        value={time}
+                        onChange={(e) => setTime(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="form-section">
+                <h3>Type de visite</h3>
+                <div className="radio-group">
+                  {filteredVisitTypes.map((type) => (
+                    <label key={type.id} className="radio-option">
+                      <input 
+                        type="radio"
+                        name="visitType"
+                        value={type.id}
+                        checked={selectedVisitType === type.id}
+                        onChange={() => setSelectedVisitType(type.id)}
+                      />
+                      <span className="radio-label">{type.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="form-section">
+                <h3>Service</h3>
+                <div className="form-group">
+                  <select
+                    id="service"
+                    name="service"
+                    value={service}
+                    onChange={(e) => setService(e.target.value)}
+                    required
+                  >
+                    <option value="">Sélectionner un service</option>
+                    <option value="Médecine Générale">Médecine Générale</option>
+                    <option value="Pédiatrie">Pédiatrie</option>
+                    <option value="Orthopédie">Orthopédie</option>
+                    <option value="Dermatologie">Dermatologie</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className="form-section">
+                <h3>Prestataire</h3>
+                <div className="form-group">
+                  <select 
+                    className="doctor-select"
+                    value={idMedecin || ''}
+                    onChange={(e) => setIdMedecin(e.target.value || null)}
+                  >
+                    <option value="">Sélectionner un prestataire</option>
+                    {doctors
+                      .filter(doctor => !service || doctor.nomSpecialite === service)
+                      .map((doctor) => (
+                      <option key={doctor.idMedecin} value={doctor.idMedecin}>
+                        Dr. {doctor.prenom} {doctor.nom} ({doctor.nomSpecialite})
+                      </option>
+                    ))}
+                  </select>
+                  {isLoadingDoctors && <div className="mini-loader"></div>}
+                </div>
+              </div>
+              
+              <div className="form-actions">
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={onClose}
+                  disabled={isSubmitting}
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  className="submit-btn"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Création en cours...' : 'Démarrer la visite'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  // Edit Appointment Form Component
+  interface EditAppointmentFormProps {
+    isOpen: boolean;
+    onClose: () => void;
+    appointment: Visit | null;
+    onSuccess: () => void;
+  }
+
+  // Function to convert Visit to Appointment
+const convertVisitToAppointment = (visit: Visit | null): Appointment | undefined => {
+  if (!visit) return undefined;
+
+  // Determine the visit type, ensuring it's in the correct format
+  const visitType = visit.typeVisite || '';
+
+  return {
+    id: visit.idVisite?.toString(),
+    idPatient: visit.patient?.idPatient || '',
+    idMedecin: visit.medecin?.idMedecin || visit.idMedecin || '',
+    dateHeure: visit.dateDebut,
+    durationMinutes: 30, // Default duration if not provided
+    commentaire: visit.commentaire || '',
+    note: visit.commentaire || '', // Add note field for backend compatibility
+    status: visit.statut,
+    service: visit.service || '',
+    typeVisite: visitType,
+    typeVisit: visitType, // Both fields for compatibility
+    
+    // Complete objects
+    patient: visit.patient,
+    medecin: visit.medecin
+  };
+};
+
+const EditAppointmentForm = ({ isOpen, onClose, appointment, onSuccess }: EditAppointmentFormProps) => {
+  // Convert Visit to Appointment
+  const appointmentData = convertVisitToAppointment(appointment);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const { showToast } = useToast();
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userRole = user?.role?.toUpperCase() || '';
+  
+  // Handle saved appointment
+  const handleAppointmentSaved = (savedAppointment: Appointment) => {
+    console.log('Appointment saved:', savedAppointment);
+    onSuccess();
+    onClose();
+  };
+  
+  // Handle delete appointment
+  const handleDeleteAppointment = async () => {
+    if (!appointmentData?.id) {
+      console.error('No appointment ID found for deletion');
+      return;
+    }
+    
+    setShowDeleteConfirm(true);
+  };
+  
+  // Confirm delete execution
+  const confirmDelete = async () => {
+    try {
+      setIsDeleting(true);
+      setDeleteError(null);
+      
+      // Call the permanent delete appointment API
+      await axios.delete(`${API_ENDPOINTS.PERMANENT_DELETE_APPOINTMENT}/${appointmentData!.id}`);
+      
+      console.log('Appointment deleted successfully');
+      setShowDeleteConfirm(false);
+      // Show success message
+      showToast('Rendez-vous supprimé avec succès', 'success');
+      onSuccess();
+      onClose();
+    } catch (error) {
+      console.error('Error deleting appointment:', error);
+      setDeleteError('Erreur lors de la suppression du rendez-vous');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  return (
+    <>
+      {/* Overlay for clicking outside the form */}
+      <div 
+        className={`overlay ${isOpen ? 'visible' : ''}`}
+        onClick={onClose}
+      />
+      
+      <AppointmentForm
+        isOpen={isOpen}
+        onClose={onClose}
+        selectedAppointment={appointmentData}
+        onAppointmentSaved={handleAppointmentSaved}
+        extraActions={userRole === 'AGENT' ? (
+          <button
+            type="button"
+            className="delete-btn"
+            onClick={handleDeleteAppointment}
+            disabled={isDeleting}
+          >
+            {isDeleting ? 'Suppression...' : 'Supprimer'}
+          </button>
+        ) : null}
+        deleteError={deleteError}
+        userRole={userRole}
+      />
+      
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <>
+          <div className="overlay visible" onClick={() => setShowDeleteConfirm(false)} />
+          <div className="delete-confirmation-modal">
+            <div className="delete-confirmation-header">
+              <h3>Confirmation de suppression</h3>
+            </div>
+            <div className="delete-confirmation-content">
+              <p>Êtes-vous sûr de vouloir supprimer ce rendez-vous ?</p>
+              <p>Cette action est irréversible.</p>
+            </div>
+            <div className="delete-confirmation-actions">
+              <button 
+                className="cancel-btn" 
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isDeleting}
+              >
+                Annuler
+              </button>
+              <button 
+                className="delete-btn" 
+                onClick={confirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Suppression...' : 'Confirmer'}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </>
+  );
+};
+
+  // ActiveVisitsTable Component 
+  const ActiveVisitsTable = ({ 
+    visits = [], 
+    isLoading, 
+    onRefresh, 
+    onPatientClick,
+    error = null
+  }: { 
+    visits: Visit[], 
+    isLoading: boolean, 
+    onRefresh: () => void,
+    onPatientClick: (ipp: string) => void,
+    error?: string | null
+  }) => {
+  const [filterText, setFilterText] = useState('');
+  
+  const formatVisitTime = (dateString: string) => {
+    if (!dateString) return "Date inconnue";
+    
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "Date invalide";
+    
+    const today = new Date();
+    const isToday = date.getDate() === today.getDate() && 
+                    date.getMonth() === today.getMonth() && 
+                    date.getFullYear() === today.getFullYear();
+    
+    const timeStr = date.toLocaleTimeString('fr-FR', { 
+      hour: '2-digit', 
+      minute: '2-digit'
+    });
+    
+    return isToday ? `Aujourd'hui, ${timeStr}` : `${date.toLocaleDateString('fr-FR')}, ${timeStr}`;
+  };
+  
+  const calculateAge = (birthDate: string): number => {
+    if (!birthDate) return 0;
+    
+    const today = new Date();
+    const dob = new Date(birthDate);
+    if (isNaN(dob.getTime())) return 0;
+    
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+    
+    return age >= 0 ? age : 0;
+  };
+  
+  const filteredVisits = visits.filter(visit => {
+    if (!visit || !visit.patient) return false;
+    
+    const filter = filterText.toLowerCase();
+    const patientName = `${visit.patient.prenom || ''} ${visit.patient.nom || ''}`.toLowerCase();
+    const visitType = (visit.typeVisite || '').toLowerCase();
+    const patientIPP = (visit.patient.ipp || '').toLowerCase();
+    
+    return patientName.includes(filter) || 
+            visitType.includes(filter) || 
+            patientIPP.includes(filter);
+  });
+
+  return (
+    <div className="section-container">
+      <div className="section-header">
+        <h2>Visites Actives</h2>
+        <div className="header-actions">
+          <input
+            type="text"
+            placeholder="Rechercher un patient"
+            className="filter-input"
+            value={filterText}
+            onChange={(e) => setFilterText(e.target.value)}
+          />
+          <button
+            className="refresh-button"
+            onClick={onRefresh}
+            disabled={isLoading}
+          >
+            <RefreshIcon />
+            Actualiser
+          </button>
+        </div>
+      </div>
+      
+      {isLoading ? (
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Chargement des visites actives...</p>
+        </div>
+      ) : error ? (
+        <div className="error-container">
+          <p>{error}</p>
+          <button className="refresh-button" onClick={onRefresh}>
+            Réessayer
+          </button>
+        </div>
+      ) : visits.length === 0 ? (
+        <div className="no-visits-container">
+          <ClipboardsIcon />
+          <p>Aucune visite active</p>
+        </div>
+      ) : (
+        <div className="visits-table-container">
+          <table className="visits-table">
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Sexe</th>
+                <th>Âge</th>
+                <th>Type de visite</th>
+                <th>Service</th>
+                <th>Prestataire</th>
+                <th>Arrivée</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredVisits.map(visit => {
+                const age = visit.patient?.dateNaissance 
+                  ? calculateAge(visit.patient.dateNaissance) 
+                  : null;
+                
+                return (
+                <tr key={visit.idVisite}>
+                    <td 
+                      className="patient-name-cell"
+                      onClick={() => visit.patient?.ipp && onPatientClick(visit.patient.ipp)}
+                      style={{ color: '#2c62e8', cursor: 'pointer', fontWeight: 600 }}
+                    >
+                      {visit.patient?.prenom} {visit.patient?.nom}
+                      {visit.fromAppointment && (
+                        <span className="visit-badge" title="Visite démarrée à partir d'un rendez-vous">RDV</span>
+                      )}
+                  </td>
+                    <td>{visit.patient?.sexe === 'M' ? 'M' : 'F'}</td>
+                    <td>{age !== null ? age : '-'}</td>
+                    <td>{visit.typeVisite}</td>
+                    <td>{visit.service}</td>
+                    <td>{visit.medecin ? `Dr. ${visit.medecin.prenom} ${visit.medecin.nom}` : '-'}</td>
+                    <td>{formatVisitTime(visit.dateDebut)}</td>
+                </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
+
+// ActiveVisitsTable Component 
+const ActiveVisitRow = ({ 
+  visits = [], 
+  isLoading, 
+  onRefresh, 
+  onPatientClick,
+  error = null
+}: { 
+  visits: Visit[], 
+  isLoading: boolean, 
+  onRefresh: () => void,
+  onPatientClick: (ipp: string) => void,
+  error?: string | null
+}) => {
+  // Add filter state for doctor dashboard
+  const [filterText, setFilterText] = useState<string>('');
+  const { user } = useAuth(); // Get current user to check role
+  const isMedecin = user?.role?.toUpperCase() === 'MEDECIN';
+  
+  const filteredVisits = visits.filter(visit => {
+    if (!visit || !visit.patient) return false;
+    const ft = filterText.toLowerCase();
+    const name = `${visit.patient.prenom || ''} ${visit.patient.nom || ''}`.toLowerCase();
+    const type = (visit.typeVisite || '').toLowerCase();
+    const ipp = (visit.patient.ipp || '').toLowerCase();
+    return name.includes(ft) || type.includes(ft) || ipp.includes(ft);
+  });
+
+  const formatVisitTime = (dateString: string) => {
+    if (!dateString) return "Date inconnue";
+    
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "Date invalide";
+    
+    const today = new Date();
+    const isToday = date.getDate() === today.getDate() && 
+                    date.getMonth() === today.getMonth() && 
+                    date.getFullYear() === today.getFullYear();
+    
+    const timeStr = date.toLocaleTimeString('fr-FR', { 
+      hour: '2-digit', 
+      minute: '2-digit'
+    });
+    
+    return isToday ? `Aujourd'hui, ${timeStr}` : `${date.toLocaleDateString('fr-FR')}, ${timeStr}`;
+  };
+
+  const calculateAge = (birthDate: string): number => {
+    if (!birthDate) return 0;
+    
+    const today = new Date();
+    const dob = new Date(birthDate);
+    if (isNaN(dob.getTime())) return 0;
+    
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+    
+    return age >= 0 ? age : 0;
+  };
+
+  return (
+    <>
+      <div className="section-header">
+        <h2>Patient Actuel</h2>
+        <div className="header-actions">
+          <input
+            type="text"
+            placeholder="Rechercher un patient"
+            className="filter-input"
+            value={filterText}
+            onChange={(e) => setFilterText(e.target.value)}
+          />
+          <button
+            className="refresh-button"
+            onClick={onRefresh}
+            disabled={isLoading}
+          >
+            <RefreshIcon /> Actualiser
+          </button>
+        </div>
+      </div>
+      
+      {error ? (
+        <div className="error-container">
+          <p>{error}</p>
+          <button className="refresh-button" onClick={onRefresh}>
+            Réessayer
+          </button>
+        </div>
+      ) : isLoading ? (
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Chargement de la visite...</p>
+        </div>
+      ) : filteredVisits.length > 0 ? (
+        <div className="visits-table-container">
+          <table className="visits-table">
+            <thead>
+              <tr>
+                          <th>Patient</th>
+                          <th>Sexe</th>
+                          <th>Âge</th>
+                          <th>Type de visite</th>
+                          <th>Service</th>
+                          <th>Arrivée</th>
+                {!isMedecin && <th>Notes</th>}
+                          <th></th>
+                          <th></th>
+                        </tr>
+            </thead>
+            <tbody>
+              {filteredVisits.map(visit => (
+                <tr key={visit.idVisite}>
+                  <td>
+                    <span 
+                      className="patient-name-cell"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (visit.patient?.ipp) {
+                          onPatientClick(visit.patient.ipp);
+                        }
+                      }}
+                      style={{ color: '#2c62e8', cursor: 'pointer', fontWeight: 600 }}
+                    >
+                      {visit.patient?.prenom || ''} {visit.patient?.nom || ''}
+                    </span>
+                  </td>
+                  <td>{visit.patient?.sexe || 'N/A'}</td>
+                  <td>{visit.patient?.dateNaissance ? calculateAge(visit.patient.dateNaissance) : 'N/A'}</td>
+                  <td>{visit.typeVisite || 'N/A'}</td>
+                  <td>{visit.service || 'Non spécifié'}</td>
+                  <td className="visit-time">
+                    {formatVisitTime(visit.dateDebut)}
+                  </td>
+                  {!isMedecin && (
+                  <td className="visit-notes">
+                    {visit.commentaire || visit.note || '-'}
+                  </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="no-visits-container">
+          <ClipboardsIcon />
+          <p>Vous n'avez pas de patient actuellement assigné.</p>
+          <p className="no-results-hint">Les patients vous seront assignés par l'agent d'accueil.</p>
+        </div>
+      )}
+    </>
+  );
+};
+
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null; errorInfo: React.ErrorInfo | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(_: Error, errorInfo: React.ErrorInfo) {
+    this.setState({ errorInfo });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ 
+          padding: "20px", 
+          backgroundColor: "#ffebee", 
+          color: "#c62828",
+          margin: "20px",
+          borderRadius: "8px"
+        }}>
+          <h2>Une erreur est survenue</h2>
+          <details style={{ whiteSpace: "pre-wrap", marginTop: "10px" }}>
+            <summary>Afficher les détails</summary>
+            <p>{this.state.error?.toString()}</p>
+            <p>Pile de composants: {this.state.errorInfo?.componentStack}</p>
+          </details>
+          <button 
+            onClick={() => window.location.reload()}
+            style={{
+              marginTop: "15px",
+              padding: "8px 16px",
+              backgroundColor: "#1E513B",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer"
+            }}
+          >
+            Recharger la page
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+// Agent Dashboard Component
+const AgentDashboard = ({ readOnly = false }: { readOnly?: boolean } = {}) => {
+  // Add style element to apply table styles
+  useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.innerHTML = doctorTableStyles;
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
+
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Patient[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [activeVisits, setActiveVisits] = useState<Visit[]>([]);
+  const [activeVisitsCount, setActiveVisitsCount] = useState(0);
+  const [completedVisits, setCompletedVisits] = useState<Visit[]>([]);
+  const [completedVisitsCount, setCompletedVisitsCount] = useState(0);
+  const [upcomingVisits, setUpcomingVisits] = useState<Visit[]>([]);
+  const [upcomingVisitsCount, setUpcomingVisitsCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUpcomingLoading, setIsUpcomingLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [upcomingError, setUpcomingError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [showStartVisitForm, setShowStartVisitForm] = useState(false);
+  const [selectedPatientIPP, setSelectedPatientIPP] = useState<string>('');
+  const [selectedVisit, setSelectedVisit] = useState<Visit | undefined>(undefined);
+  // Add state for filtering appointments
+  const [upcomingVisitsSearchTerm, setUpcomingVisitsSearchTerm] = useState<string>('');
+  // Add state for tracking active menu
+  const [openMenuAppointmentId, setOpenMenuAppointmentId] = useState<number | null>(null);
+  // Add state for edit appointment form
+  const [showEditAppointmentForm, setShowEditAppointmentForm] = useState(false);
+  const [appointmentToEdit, setAppointmentToEdit] = useState<Visit | null>(null);
+  // Add state for today's invoices
+  const [todayInvoices, setTodayInvoices] = useState<any[]>([]);
+  const [isLoadingInvoices, setIsLoadingInvoices] = useState<boolean>(false);
+  const [invoicesError, setInvoicesError] = useState<string | null>(null);
+  
+  // Add state for pending factures
+  const [pendingFactures, setPendingFactures] = useState<any[]>([]);
+  const [isLoadingPendingFactures, setIsLoadingPendingFactures] = useState<boolean>(false);
+  const [pendingFacturesError, setPendingFacturesError] = useState<string | null>(null);
+  
+  // Add state for facture panel
+  const [isFacturePanelOpen, setIsFacturePanelOpen] = useState<boolean>(false);
+  const [selectedFacture, setSelectedFacture] = useState<any | null>(null);
+  
+  // Add state for delete confirmation
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
+  
+  const searchInputRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const actionMenuRef = useRef<HTMLDivElement>(null);
+  
+  // Close search and user menu when clicking outside
+  useEffect(() => {
+    // Use a variable to track if navigation is in progress
+    let isNavigating = false;
+    
+    function handleClickOutside(event: MouseEvent) {
+      // Skip this handler if navigation is in progress
+      if (isNavigating) return;
+      
+      if (searchInputRef.current && 
+          !searchInputRef.current.contains(event.target as Node) &&
+          !(event.target as Element).closest('.search-button') &&
+          !(event.target as Element).closest('.patient-item')) {
+        setShowSearch(false);
+      }
+      
+      if (userMenuRef.current && 
+          !userMenuRef.current.contains(event.target as Node) &&
+          !(event.target as Element).closest('.user-button')) {
+        setShowUserMenu(false);
+      }
+      
+      // Close action menu when clicking outside
+      if (!(event.target as Element).closest('.action-menu-button') && 
+          !(event.target as Element).closest('.action-menu-popup')) {
+        setOpenMenuAppointmentId(null);
+      }
+    }
+    
+    // Listen for navigation events from React Router
+    window.addEventListener('popstate', () => {
+      isNavigating = true;
+      // Reset after navigation
+      setTimeout(() => {
+        isNavigating = false;
+      }, 100);
+    });
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('popstate', () => {});
+    };
+  }, []);
+  
+  // Focus input when search is shown and update debug info
+  useEffect(() => {
+    console.log('Search panel visibility changed:', showSearch);
+    
+    if (showSearch && searchInputRef.current) {
+      const input = searchInputRef.current.querySelector('input');
+      if (input) {
+        console.log('Focusing search input');
+        input.focus();
+      }
+    }
+  }, [showSearch]);
+  
+  // Fetch active and completed visits on load and set up periodic refresh
+  useEffect(() => {
+    // Initial fetch
+    fetchActiveVisits();
+    fetchCompletedVisits();
+    fetchUpcomingVisits();
+    
+    // Auto-refresh has been removed as requested
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  
+  const fetchActiveVisits = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await axios.get(API_ENDPOINTS.VISITS.GET_ALL_ACTIVE);
+      
+      // Handle different possible response formats
+      if (response.data?.visites) {
+        console.log('Active visits:', response.data.visites);
+        setActiveVisits(response.data.visites);
+        setActiveVisitsCount(response.data.visites.length || 0);
+      } else if (Array.isArray(response.data)) {
+        console.log('Active visits (array):', response.data);
+        setActiveVisits(response.data);
+        setActiveVisitsCount(response.data.length);
+      } else {
+        setActiveVisits([]);
+        setActiveVisitsCount(0);
+      }
+      
+      // Override count if explicitly provided in response
+      if (response.data?.count !== undefined) {
+        setActiveVisitsCount(response.data.count);
+      }
+    } catch {
+      setError('Erreur lors du chargement des visites actives');
+      setActiveVisits([]);
+      setActiveVisitsCount(0);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const fetchCompletedVisits = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Only fetch today's completed visits
+      const today = new Date().toISOString().split('T')[0];
+      const response = await axios.get<CompletedVisitsResponse>(
+          API_ENDPOINTS.VISITS.GET_TODAY_COMPLETED
+        );
+      
+      if (response.data.visites) {
+        setCompletedVisits(response.data.visites);
+        setCompletedVisitsCount(response.data.count ?? response.data.visites.length);
+      } else {
+        setCompletedVisits([]);
+        setCompletedVisitsCount(0);
+      }
+    } catch (error) {
+      console.error("Error fetching completed visits:", error);
+      setCompletedVisits([]);
+      setCompletedVisitsCount(0);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Add a utility function to extract doctor ID in the right format
+  const getDoctorId = (user: any): string | null => {
+    console.log("Getting doctor ID from user object:", user);
+    
+    if (!user) return null;
+    
+    // First try the idMedecin that should be added by the backend mapper
+    if (user.idMedecin) {
+      console.log("Found idMedecin in user object:", user.idMedecin);
+      return user.idMedecin.toString();
+    }
+    
+    // If the user object has a nested medecin object, try to use its ID
+    if (user.medecin?.idMedecin) {
+      console.log("Found medecin.idMedecin in user object:", user.medecin.idMedecin);
+      return user.medecin.idMedecin.toString();
+    }
+    
+    // Try other possible ID fields
+    if (user.id) {
+      console.log("Using fallback user.id:", user.id);
+      return user.id.toString();
+    }
+    
+    if (user.idUtilisateur) {
+      console.log("Using fallback user.idUtilisateur:", user.idUtilisateur);
+      return user.idUtilisateur.toString();
+    }
+    
+    // If we can't find a reasonable ID, log all properties to help debug
+    console.log("Could not find doctor ID. All user properties:");
+    Object.keys(user).forEach(key => {
+      console.log(`${key}: ${JSON.stringify(user[key])}`);
+    });
+    
+    return null;
+  };
+
+  // For the agent dashboard, replace the entire fetchUpcomingVisits function
+  const fetchUpcomingVisits = async () => {
+    try {
+      setIsUpcomingLoading(true);
+      setUpcomingError(null);
+      
+      console.log("Agent Dashboard: Fetching upcoming appointments for today");
+      
+      // Agents should see ALL appointments, no filtering by doctor
+      const response = await axios.get<UpcomingAppointmentsResponse>(
+        API_ENDPOINTS.VISITS.GET_UPCOMING_TODAY
+      );
+      
+      console.log("Agent Dashboard: Upcoming appointments response:", response.data);
+      
+      if (response.data && response.data.appointments) {
+        // Map the appointments to match the Visit interface used in UI
+                  const appointments = response.data.appointments.map(appointment => {
+          return {
+            idVisite: appointment.idRendezVous ? Number(appointment.idRendezVous) : (appointment.id ? Number(appointment.id) : 0),
+            typeVisite: appointment.typeVisite || appointment.typeVisit || '',
+            dateDebut: appointment.dateDebut || appointment.dateHeure,
+            commentaire: appointment.commentaire || '',
+            note: appointment.note || '',
+            statut: appointment.status || RendezVousStatus.PLANIFIE, // Trust the backend status
+            service: appointment.service || '',
+            patient: appointment.patient || {
+              idPatient: appointment.idPatient,
+              ipp: '',
+              nom: '',
+              prenom: '',
+              dateNaissance: '',
+              lieuNaissance: '',
+              sexe: '',
+              adresse: '',
+              ville: '',
+              telephone: '',
+              email: '',
+              cin: '',
+              nationalite: '',
+              etatCivil: '',
+              contactUrgencePrenom: '',
+              contactUrgenceRelation: '',
+              contactUrgenceAdresse: '',
+              contactUrgenceTelephone: '',
+              typeAdmission: '',
+              dateAdmission: '',
+              dateCreation: ''
+            },
+            medecin: appointment.medecin
+          } as Visit;
+        });
+        
+        // Filter out appointments with status EN_COURS or COMPLETE
+        const filteredAppointments = appointments.filter(appointment => {
+          return appointment.statut !== RendezVousStatus.EN_COURS && 
+                 appointment.statut !== RendezVousStatus.COMPLETE;
+        });
+        
+        console.log("Agent Dashboard: Filtered appointments count:", filteredAppointments.length);
+        console.log("Agent Dashboard: Filtered out", appointments.length - filteredAppointments.length, "appointments with status EN_COURS or COMPLETE");
+        
+        setUpcomingVisits(filteredAppointments);
+        setUpcomingVisitsCount(filteredAppointments.length); // Use the filtered length
+      } else {
+        console.warn("Agent Dashboard: Unexpected response format for upcoming appointments:", response.data);
+        setUpcomingVisits([]);
+        setUpcomingVisitsCount(0);
+      }
+    } catch (error) {
+      console.error("Agent Dashboard: Error fetching upcoming appointments:", error);
+      setUpcomingVisits([]);
+      setUpcomingVisitsCount(0);
+      setUpcomingError("Erreur lors du chargement des rendez-vous programmés");
+    } finally {
+      setIsUpcomingLoading(false);
+    }
+  };
+  
+  // Handle clicking on a patient (navigate to patient profile)
+  const handlePatientClick = (ipp: string) => {
+    try {
+      if (!ipp) {
+        throw new Error('Invalid patient IPP');
+      }
+      
+      setIsLoading(true);
+      // Use medecin path for doctor dashboard
+      navigate(`/medecin/patient/${ipp}`);
+    } catch {
+      alert('Erreur lors de la navigation vers le profil du patient. Veuillez réessayer.');
+      setIsLoading(false);
+    }
+  };
+  
+  const searchTimeout = useRef<number | null>(null);
+  
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+    
+    if (value.trim().length > 0) {
+      searchTimeout.current = setTimeout(() => {
+        performSearch(value);
+      }, 300);
+    } else {
+      setSearchResults([]);
+    }
+  };
+  
+  const performSearch = async (query: string) => {
+    if (!query.trim()) return;
+    
+    setIsSearching(true);
+    
+    try {
+      const searchUrl = `${API_ENDPOINTS.PATIENTS.SEARCH}?query=${encodeURIComponent(query.trim())}`;
+      
+      // Add user role and ID headers for access control (AGENT role)
+      const headers = {
+        'X-User-Role': user?.role || '',
+        'X-User-Id': user?.id || user?.idUtilisateur || ''
+      };
+      
+      const response = await axios.get<PatientSearchResponse>(searchUrl, { headers });
+      
+      // Handle different possible response structures
+      if (response.data.patients) {
+        setSearchResults(response.data.patients);
+      } else if (Array.isArray(response.data)) {
+        setSearchResults(response.data);
+      } else {
+        setSearchResults([]);
+      }
+      
+      // Force the search panel to be active when we have results
+      if (!showSearch) {
+        setShowSearch(true);
+      }
+    } catch (error) {
+      console.error("Error searching patients:", error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+  
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Just prevent form submission, the search is handled by handleSearchChange
+    if (searchQuery.trim()) {
+      performSearch(searchQuery);
+    }
+  };
+  
+  const toggleSearch = () => {
+    const newState = !showSearch;
+    setShowSearch(newState);
+    
+    if (newState) {
+      // When opening search, don't clear previous results if there's already a query
+      if (!searchQuery.trim()) {
+        setSearchResults([]);
+      }
+      
+      // Focus the input after a slight delay to let the animation start
+      setTimeout(() => {
+        if (searchInputRef.current) {
+          const input = searchInputRef.current.querySelector('input');
+          if (input) input.focus();
+        }
+      }, 100);
+    }
+    
+    // Log the action for debugging
+    console.log('Toggle search:', newState ? 'show' : 'hide');
+  };
+  
+  const toggleUserMenu = () => {
+    setShowUserMenu(!showUserMenu);
+  };
+
+  // Check if we're on the patient creation page or edit page
+  const isPatientCreationPage = location.pathname === '/agent/patient/new';
+  const isPatientEditPage = location.pathname.startsWith('/agent/patient/edit/');
+  const showPatientForm = isPatientCreationPage || isPatientEditPage;
+
+  // Additional functions to handle upcoming visits table
+  const calculateAge = (birthDate: string): number => {
+    const birthDateObj = new Date(birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDateObj.getFullYear();
+    const monthDiff = today.getMonth() - birthDateObj.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDateObj.getDate())) {
+      age--;
+    }
+    
+    return age;
+  };
+  
+  const formatVisitTime = (dateString: string) => {
+    if (!dateString) return 'N/A';
+    
+    try {
+      const date = new Date(dateString);
+      
+      // Format the time as HH:MM
+      return date.toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch (e) {
+      console.error("Error formatting visit time:", e);
+      return 'Erreur';
+    }
+  };
+
+  // Track the previous active tab to know when we switch
+  const prevActiveTabRef = useRef<string>(activeTab);
+  
+  // Add effect to refresh upcoming appointments when switching from appointments tab back to dashboard
+  useEffect(() => {
+    const prevTab = prevActiveTabRef.current;
+    
+    // If we're switching from appointments tab to dashboard tab, refresh the upcoming appointments
+    if (prevTab === 'appointments' && activeTab === 'dashboard') {
+      console.log('Switching from appointments to dashboard tab, refreshing upcoming appointments');
+      fetchUpcomingVisits();
+    }
+    
+    // Update the previous tab reference
+    prevActiveTabRef.current = activeTab;
+  }, [activeTab, fetchUpcomingVisits]);
+
+  // Check if we're on the Add Patient page
+  const isAddPatientPage = location.pathname === '/agent/patient/new';
+  
+  // Add a function to fetch today's invoices
+  const fetchTodayInvoices = async () => {
+    try {
+      setIsLoadingInvoices(true);
+      setInvoicesError(null);
+      
+      const response = await axios.get(API_ENDPOINTS.FACTURES.GET_TODAY);
+      // Sort today's invoices by payment date (most recent first)
+      const sortedInvoices = response.data.sort((a: any, b: any) => {
+        const dateA = new Date(a.dateFacturation || a.date_facturation || a.datePaiement || a.date_paiement || a.createdAt || 0);
+        const dateB = new Date(b.dateFacturation || b.date_facturation || b.datePaiement || b.date_paiement || b.createdAt || 0);
+        return dateB.getTime() - dateA.getTime();
+      });
+      setTodayInvoices(sortedInvoices);
+    } catch (error) {
+      console.error("Error fetching today's invoices:", error);
+      setInvoicesError("Erreur lors du chargement des factures du jour");
+      setTodayInvoices([]);
+    } finally {
+      setIsLoadingInvoices(false);
+    }
+  };
+
+  const fetchPendingFactures = async () => {
+    try {
+      setIsLoadingPendingFactures(true);
+      setPendingFacturesError(null);
+      
+      const response = await axios.get(API_ENDPOINTS.FACTURES.GET_PENDING);
+      // Sort pending factures by ID in descending order (highest/most recent ID first)
+      const sortedFactures = response.data.sort((a: any, b: any) => {
+        const idA = Number(a.idFacture || a.id_facture || a.id || 0);
+        const idB = Number(b.idFacture || b.id_facture || b.id || 0);
+        return idB - idA;
+      });
+      setPendingFactures(sortedFactures);
+    } catch (error) {
+      console.error("Error fetching pending factures:", error);
+      setPendingFacturesError("Erreur lors du chargement des factures en attente");
+      setPendingFactures([]);
+    } finally {
+      setIsLoadingPendingFactures(false);
+    }
+  };
+
+  const handleFacturerClick = (facture: any) => {
+    setSelectedFacture(facture);
+    setIsFacturePanelOpen(true);
+  };
+
+  // Helper function to get filtered invoices by status
+  const getFilteredInvoices = (status: 'payé' | 'non payé') => {
+    return todayInvoices.filter((invoice: any) => {
+      const invoiceStatus = (invoice.status || invoice.statut || "").toLowerCase();
+      return invoiceStatus === status;
+    });
+  };
+
+  // Fetch invoices when switching to the factures tab
+  useEffect(() => {
+    if (activeTab === 'factures' && user?.role?.toUpperCase() === 'AGENT') {
+      fetchTodayInvoices();
+      
+      // Fetch pending factures
+      const fetchPendingFacturesAsync = async () => {
+        try {
+          setIsLoadingPendingFactures(true);
+          setPendingFacturesError(null);
+          
+          const response = await axios.get(API_ENDPOINTS.FACTURES.GET_PENDING);
+          // Sort pending factures by ID in descending order (highest/most recent ID first)
+          const sortedFactures = response.data.sort((a: any, b: any) => {
+            const idA = Number(a.idFacture || a.id_facture || a.id || 0);
+            const idB = Number(b.idFacture || b.id_facture || b.id || 0);
+            return idB - idA;
+          });
+          setPendingFactures(sortedFactures);
+        } catch (error) {
+          console.error("Error fetching pending factures:", error);
+          setPendingFacturesError("Erreur lors du chargement des factures en attente");
+          setPendingFactures([]);
+        } finally {
+          setIsLoadingPendingFactures(false);
+        }
+      };
+      fetchPendingFacturesAsync();
+    }
+  }, [activeTab, user?.role]);
+  
+  return (
+    <div className={`agent-dashboard ${isAddPatientPage ? 'add-patient-page' : ''}`}>
+      {/* 1. Header (Navigation Bar) */}
+      <header className="dashboard-header">
+        <div className="logo">
+          <a href="/dashboard" title="Accueil">
+            <img src="/noBgWhite.png" alt="H-DOC Logo" className="logo-image" />
+          </a>
+        </div>
+        <div className="header-icons">
+          {/* Search container */}
+          <div className={`search-container ${showSearch ? 'active' : ''}`} onClick={() => !showSearch && toggleSearch()}>
+            {/* Search button - hidden when search panel is open */}
+            {!showSearch && (
+              <button 
+                className="icon-button search-button" 
+                aria-label="Recherche"
+                onClick={toggleSearch}
+              >
+                <SearchIcon />
+              </button>
+            )}
+            
+            {/* Search panel - only shown when active */}
+            {showSearch && (
+              <div className="search-panel">
+                <div className="search-panel-content">
+                  <form onSubmit={handleSearchSubmit} className="search-form">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    placeholder="Rechercher des patients..."
+                    className="search-input"
+                    autoFocus={showSearch}
+                  />
+                </form>
+                <button 
+                  className="close-search-btn" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowSearch(false);
+                    setSearchQuery('');
+                  }}
+                  aria-label="Fermer la recherche"
+                >
+                  <CloseIcon />
+                </button>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Add patient button - hidden for read-only users */}
+          {!readOnly && (
+            <button 
+              className="icon-button add-patient-button" 
+              aria-label="Ajouter Patient"
+              onClick={() => navigate('/agent/patient/new')}
+              title="Ajouter un nouveau patient"
+            >
+              <AddUserIcon />
+            </button>
+          )}
+          
+          {/* New Notes button - Only visible for admin users */}
+          {user?.role?.toUpperCase() === 'ADMIN' && (
+            <button 
+              className="icon-button notes-button" 
+              aria-label="Notes"
+              onClick={() => navigate('/notes')}
+              title="Accéder aux notes"
+            >
+              <NotesIcon />
+            </button>
+          )}
+          
+          {/* User menu */}
+          <div className="user-menu-container">
+            <button 
+              className="icon-button user-button" 
+              aria-label="Profil Utilisateur"
+              onClick={toggleUserMenu}
+            >
+              <CircleUserIcon />
+            </button>
+            
+            {showUserMenu && (
+              <div className="user-menu" ref={userMenuRef}>
+                <div className="user-info">
+                  <p className="user-name">{user?.prenom} {user?.nom}</p>
+                  <p className="user-role">{user?.role}</p>
+                </div>
+                <hr className="menu-divider" />
+                <button className="menu-item logout" onClick={logout}>
+                  Se déconnecter
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Search results - outside of header content but inside header to maintain z-index context */}
+        {(showSearch && (isSearching || searchResults.length > 0 || (searchQuery.length > 0 && !isSearching))) && (
+          <div className="search-results" ref={searchInputRef}>
+            {isSearching ? (
+              <div className="loading-message">
+                <div className="search-spinner"></div>
+                <p>Recherche en cours...</p>
+              </div>
+            ) : searchResults.length > 0 ? (
+              <>
+                <h3>Résultats ({searchResults.length})</h3>
+                <ul className="patient-list">
+                  {searchResults.map(patient => {
+                    // Calculate initials from name
+                    const initials = `${patient.prenom?.[0] || ''}${patient.nom?.[0] || ''}`.toUpperCase();
+                    
+                    // Calculate age from birthdate
+                    const birthDate = patient.dateNaissance ? new Date(patient.dateNaissance) : null;
+                    const age = birthDate ? Math.floor((new Date().getTime() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null;
+                    
+                    // Gender formatted with icon
+                    const gender = patient.sexe?.toUpperCase();
+                    
+                    return (
+                      <li
+                        key={patient.ipp || patient.idPatient}
+                        className="patient-item"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          
+                          if (!patient.ipp) {
+                            // Use console error instead of alert
+                            console.error("Erreur: Identifiant patient manquant");
+                            return;
+                          }
+                          
+                          setShowSearch(false);
+                          // Use proper path based on user role
+                          const path = user?.role?.toUpperCase() === 'MEDECIN' 
+                            ? `/medecin/patient/${patient.ipp}` 
+                            : `/agent/patient/${patient.ipp}`;
+                          navigate(path, { 
+                            state: { patientData: patient }
+                          });
+                        }}
+                      >
+                        <div className="patient-avatar">
+                          {initials}
+                        </div>
+                        <div className="patient-info">
+                          <div className="patient-name-row">
+                            <p className="patient-name">
+                              {patient.prenom || ''} {patient.nom || ''}
+                            </p>
+                            {gender && (
+                              <span className={`patient-sex-label ${gender === 'F' ? 'female' : 'male'}`}>
+                                {gender === 'F' ? '♀ ' : '♂ '}
+                                {gender === 'F' ? 'Femme' : 'Homme'}
+                              </span>
+                            )}
+                          </div>
+                          
+                          <div className="patient-details-second-row">
+                            {age !== null && (
+                              <span className="patient-age">
+                                {age} ans
+                              </span>
+                            )}
+                            {birthDate && (
+                              <>
+                                <span className="patient-info-separator">•</span>
+                                <span className="patient-birth">
+                                  {birthDate.toLocaleDateString('fr-FR')}
+                                </span>
+                              </>
+                            )}
+                            {patient.ipp && (
+                              <>
+                                <span className="patient-info-separator">•</span>
+                                <span className="patient-id">
+                                  IPP: <span className="patient-id-value">{patient.ipp}</span>
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            ) : searchQuery.length > 0 && !isSearching ? (
+              <div className="no-results">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#aaaaaa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  <line x1="8" y1="11" x2="14" y2="11"></line>
+                </svg>
+                <p>Aucun patient trouvé</p>
+                <p className="no-results-hint">Essayez de modifier votre recherche ou vérifiez l'orthographe</p>
+              </div>
+            ) : null}
+          </div>
+        )}
+      </header>
+
+      {/* Add Tab Navigation - hide when on Add Patient page */}
+      {!isAddPatientPage && (
+        <div className="dashboard-tabs">
+          <button 
+            className={`tab-button ${activeTab === 'dashboard' ? 'active' : ''}`}
+            onClick={() => setActiveTab('dashboard')}
+          >
+            Tableau de bord
+          </button>
+          <button 
+            className={`tab-button ${activeTab === 'appointments' ? 'active' : ''}`}
+            onClick={() => setActiveTab('appointments')}
+          >
+            Rendez-vous
+          </button>
+          {(user?.role?.toUpperCase() === 'AGENT' || user?.role?.toUpperCase() === 'ADMIN') && (
+            <button 
+              className={`tab-button ${activeTab === 'factures' ? 'active' : ''}`}
+              onClick={() => setActiveTab('factures')}
+            >
+              Factures
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Conditional Content Rendering */}
+      {showPatientForm ? (
+        isPatientCreationPage ? <PatientCreation /> : <PatientEdit />
+      ) : (
+        <div className={`dashboard-content ${isFacturePanelOpen ? 'facture-panel-open' : ''}`}>
+          {activeTab === 'dashboard' && (
+            <>
+              {/* 2. Main Title Section */}
+              <div className="main-title-section">
+                <div className="title-area">
+                  <HospitalIcon />
+                  <h1>Bienvenue, {user?.prenom ? `${user.prenom} ${user.nom || ''}` : (readOnly ? 'Administrateur' : 'Docteur')}</h1>
+                </div>
+              </div>
+
+              {/* 3. Dashboard Content Section */}
+              <div className="summary-cards">
+                {/* Completed Visits Card */}
+                <div className="summary-card">
+                  <div className="card-content">
+                    <h2>Visites Terminées</h2>
+                    <p className="subtitle">Aujourd'hui</p>
+                    <p className="value">{completedVisitsCount}</p>
+                  </div>
+                </div>
+
+                {/* Active Visits Card */}
+                <div className="summary-card">
+                  <div className="card-content">
+                    <h2>Visites Actives</h2>
+                    <p className="subtitle">Patients</p>
+                    <p className="value">{activeVisitsCount}</p>
+                  </div>
+                </div>
+
+                {/* Upcoming Visits Card */}
+                <div className="summary-card">
+                  <div className="card-content">
+                    <h2>Rendez-vous prévus</h2>
+                    <p className="subtitle">Aujourd'hui</p>
+                    <p className="value">{upcomingVisitsCount}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 4. Active Visits Section */}
+              <div className="active-visits-section">
+                {/* Wrap just the table component in try-catch for more specific error handling */}
+                {(() => {
+                  try {
+                    return (
+                      <ActiveVisitsTable
+                        visits={activeVisits || []}
+                        isLoading={isLoading}
+                        onRefresh={fetchActiveVisits}
+                        onPatientClick={handlePatientClick}
+                        error={error}
+                      />
+                    );
+                  } catch (err) {
+                    console.error("Failed to render ActiveVisitsTable:", err);
+                    return (
+                      <div className="error-container">
+                        <p>Erreur d'affichage des visites actives</p>
+                        <button className="refresh-button" onClick={fetchActiveVisits}>
+                          Réessayer
+                        </button>
+                      </div>
+                    );
+                  }
+                })()}
+              </div>
+              
+              {/* 5. Upcoming Visits Section */}
+              <div className="upcoming-visits-section">
+                <div className="section-header">
+                  <h2>Rendez-vous prévus aujourd'hui ({upcomingVisitsCount})</h2>
+                  <div className="header-actions">
+                    <input
+                      type="text"
+                      placeholder="Rechercher un patient"
+                      className="filter-input"
+                      value={upcomingVisitsSearchTerm}
+                      onChange={(e) => setUpcomingVisitsSearchTerm(e.target.value)}
+                    />
+                    <button 
+                      className="refresh-button" 
+                      onClick={fetchUpcomingVisits}
+                      disabled={isUpcomingLoading}
+                    >
+                      <RefreshIcon />
+                      Actualiser
+                    </button>
+                  </div>
+                </div>
+                
+                {isUpcomingLoading ? (
+                  <div className="loading-container">
+                    <div className="spinner"></div>
+                    <p>Chargement des rendez-vous...</p>
+                  </div>
+                ) : upcomingError ? (
+                  <div className="error-container">
+                    <p>{upcomingError}</p>
+                    <button className="refresh-button" onClick={fetchUpcomingVisits}>
+                      Réessayer
+                    </button>
+                  </div>
+                ) : upcomingVisits.length === 0 ? (
+                  <div className="empty-state">
+                    <p>Aucun rendez-vous prévu pour aujourd'hui</p>
+                  </div>
+                ) : (
+                  <div className="visits-table-container">
+                    <table className="visits-table">
+                      <thead>
+                        <tr>
+                          <th>Patient</th>
+                          <th>Sexe</th>
+                          <th>Âge</th>
+                          <th>Type de visite</th>
+                          {user?.role?.toUpperCase() !== 'MEDECIN' && <th>Service</th>}
+                          {readOnly ? <th>Médecin</th> : <th>Arrivée</th>}
+                          {readOnly ? <th>Heure d'arrivée</th> : <th></th>}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {upcomingVisits
+                          .filter(visit => upcomingVisitsSearchTerm 
+                            ? visit.patient?.nom?.toLowerCase().includes(upcomingVisitsSearchTerm.toLowerCase()) || 
+                              visit.patient?.prenom?.toLowerCase().includes(upcomingVisitsSearchTerm.toLowerCase()) ||
+                              visit.patient?.ipp?.toLowerCase().includes(upcomingVisitsSearchTerm.toLowerCase())
+                            : true
+                          )
+                          // Sort appointments - regular first, then late
+                          .sort((a, b) => {
+                            // First sort by status (PLANIFIE first, LATE last)
+                            if (a.statut === RendezVousStatus.LATE && b.statut !== RendezVousStatus.LATE) return 1;
+                            if (a.statut !== RendezVousStatus.LATE && b.statut === RendezVousStatus.LATE) return -1;
+                            
+                            // Then sort by time
+                            return new Date(a.dateDebut).getTime() - new Date(b.dateDebut).getTime();
+                          })
+                          .map(visit => (
+                            <tr key={visit.idVisite} className={visit.statut === RendezVousStatus.LATE ? 'late-appointment' : ''}>
+                              <td 
+                                className="patient-name-cell" 
+                                onClick={() => visit.patient?.ipp && handlePatientClick(visit.patient.ipp)}
+                                style={{ color: '#2c62e8', cursor: 'pointer', fontWeight: 600 }}
+                              >
+                                {visit.patient?.prenom} {visit.patient?.nom}
+                                {visit.fromAppointment && (
+                                  <span className="visit-badge" title="Visite démarrée à partir d'un rendez-vous">RDV</span>
+                                )}
+                                {visit.statut === RendezVousStatus.LATE && (
+                                  <span className="late-badge" title="Patient en retard">Retard</span>
+                                )}
+                              </td>
+                              <td>{visit.patient?.sexe === 'M' ? 'M' : 'F'}</td>
+                              <td>{visit.patient?.dateNaissance ? calculateAge(visit.patient.dateNaissance) : 'N/A'}</td>
+                              <td>{visit.typeVisite || '-'}</td>
+                              {user?.role?.toUpperCase() !== 'MEDECIN' && <td>{visit.service || '-'}</td>}
+                              {!readOnly && <td className="visit-time">
+                                {formatVisitTime(visit.dateDebut)}
+                              </td>}
+                              {readOnly ? <td>{visit.medecin ? `Dr. ${visit.medecin.prenom} ${visit.medecin.nom}` : '-'}</td> : <td className="edit-cell">
+                                {/* For medecin role, hide the edit button */}
+                                {!readOnly && user?.role?.toUpperCase() !== 'MEDECIN' && (
+                                  <div className="edit-button-container">
+                                    <button
+                                      className="edit-appointment-button action-button"
+                                      onClick={() => {
+                                        setAppointmentToEdit(visit);
+                                        setShowEditAppointmentForm(true);
+                                      }}
+                                      title="Modifier ce rendez-vous"
+                                    >
+                                      <EditIcon />
+                                    </button>
+                                    {/* Only show delete button for admin users, not for agent */}
+                                    {user?.role?.toUpperCase() === 'ADMIN' && (
+                                      <button
+                                        className="delete-appointment-button action-button"
+                                        onClick={() => {
+                                          setAppointmentToEdit(visit);
+                                          setShowDeleteConfirm(true);
+                                        }}
+                                        title="Supprimer ce rendez-vous"
+                                      >
+                                        <DeleteIcon />
+                                      </button>
+                                    )}
+                                  </div>
+                                )}
+                              </td>}
+                              {readOnly ? <td className="visit-time">{formatVisitTime(visit.dateDebut)}</td> : <td className="start-cell">
+                                {/* For medecin role, hide the start visit button */}
+                                {!readOnly && user?.role?.toUpperCase() !== 'MEDECIN' ? (
+                                  <div className="start-button-container">
+                                    <button
+                                      className="start-visit-button action-button"
+                                      onClick={() => {
+                                        setSelectedPatientIPP(visit.patient?.ipp || '');
+                                        setSelectedVisit(visit);
+                                        setShowStartVisitForm(true);
+                                      }}
+                                      title="Démarrer une visite pour ce patient"
+                                    >
+                                      Démarrer la visite
+                                    </button>
+                                  </div>
+                                ) : readOnly ? (
+                                  <span className="read-only-label">Lecture seule</span>
+                                ) : (
+                                  <span></span> /* Empty for medecin role */
+                                )}
+                              </td>}
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+          
+          {activeTab === 'appointments' && (
+            <AppointmentsCalendar userRole={readOnly ? "MEDECIN" : "AGENT"} userId={undefined} />
+          )}
+          
+          {activeTab === 'factures' && (user?.role?.toUpperCase() === 'AGENT' || user?.role?.toUpperCase() === 'ADMIN') && (
+            <div className="factures-container">
+              <div className="main-title-section">
+                <div className="title-area">
+                  <ReceiptIcon />
+                  <h1>Factures</h1>
+                </div>
+              </div>
+              
+              <div className="factures-content">
+                {/* Loading state is shared for simplicity */}
+                {isLoadingInvoices || isLoadingPendingFactures ? (
+                  <div className="loading-container">
+                    <div className="spinner"></div>
+                    <p>Chargement des factures...</p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Dedicated Pending Factures Section */}
+                    <div className="factures-section">
+                      <div className="section-header">
+                        <h2>Factures en attente</h2>
+                        <div className="header-actions">
+                          <button 
+                            className="refresh-button" 
+                            onClick={() => {
+                              const fetchPendingFacturesAsync = async () => {
+                                try {
+                                  setIsLoadingPendingFactures(true);
+                                  setPendingFacturesError(null);
+                                  
+                                  const response = await axios.get(API_ENDPOINTS.FACTURES.GET_PENDING);
+                                  // Sort pending factures by ID in descending order (highest/most recent ID first)
+                                  const sortedFactures = response.data.sort((a: any, b: any) => {
+                                    const idA = Number(a.idFacture || a.id_facture || a.id || 0);
+                                    const idB = Number(b.idFacture || b.id_facture || b.id || 0);
+                                    return idB - idA;
+                                  });
+                                  setPendingFactures(sortedFactures);
+                                } catch (error) {
+                                  console.error("Error fetching pending factures:", error);
+                                  setPendingFacturesError("Erreur lors du chargement des factures en attente");
+                                  setPendingFactures([]);
+                                } finally {
+                                  setIsLoadingPendingFactures(false);
+                                }
+                              };
+                              fetchPendingFacturesAsync();
+                            }}
+                            disabled={isLoadingPendingFactures}
+                          >
+                            <RefreshIcon />
+                            Actualiser
+                          </button>
+                        </div>
+                      </div>
+                      
+                      {pendingFacturesError ? (
+                        <div className="error-container">
+                          <p>{pendingFacturesError}</p>
+                          <button className="refresh-button" onClick={() => {
+                            const fetchPendingFacturesAsync = async () => {
+                              try {
+                                setIsLoadingPendingFactures(true);
+                                setPendingFacturesError(null);
+                                
+                                const response = await axios.get(API_ENDPOINTS.FACTURES.GET_PENDING);
+                                // Sort pending factures by ID in descending order (highest/most recent ID first)
+                                const sortedFactures = response.data.sort((a: any, b: any) => {
+                                  const idA = Number(a.idFacture || a.id_facture || a.id || 0);
+                                  const idB = Number(b.idFacture || b.id_facture || b.id || 0);
+                                  return idB - idA;
+                                });
+                                setPendingFactures(sortedFactures);
+                              } catch (error) {
+                                console.error("Error fetching pending factures:", error);
+                                setPendingFacturesError("Erreur lors du chargement des factures en attente");
+                                setPendingFactures([]);
+                              } finally {
+                                setIsLoadingPendingFactures(false);
+                              }
+                            };
+                            fetchPendingFacturesAsync();
+                          }}>
+                            Réessayer
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="factures-table-container">
+                          <table className="factures-table">
+                            <thead>
+                              <tr>
+                                <th>Facture N°</th>
+                                <th>Patient</th>
+                                <th>Statut</th>
+                                {!readOnly && <th></th>}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {pendingFactures.length === 0 ? (
+                                <tr>
+                                  <td colSpan={4} style={{ textAlign: 'center', padding: '20px' }}>
+                                    Aucune facture en attente pour le moment.
+                                  </td>
+                                </tr>
+                              ) : (
+                                pendingFactures.map((facture) => {
+                                  // Extract facture data handling different field conventions
+                                  const id = facture.idFacture || facture.id_facture || facture.id;
+                                  const patientFirstName = facture.prenomPatient || facture.prenom_patient || "";
+                                  const patientLastName = facture.nomPatient || facture.nom_patient || "";
+                                  const patientIPP = facture.idPatient || facture.id_patient || facture.ipp || "";
+                                  const idVisite = facture.idVisite || facture.id_visite || "";
+                                  
+                                  return (
+                                    <tr key={id}>
+                                      <td>{`FCT-${id}`}</td>
+                                      <td>
+                                        <span className="text-black font-medium">
+                                          {patientFirstName} {patientLastName}
+                                        </span>
+                                      </td>
+                                      <td style={{ color: '#e53e3e', fontWeight: 500 }}>non payé</td>
+                                      <td>
+                                        {!readOnly ? (
+                                          <button
+                                            className="start-visit-button action-button"
+                                            onClick={() => handleFacturerClick(facture)}
+                                            title="Traiter cette facture"
+                                          >
+                                            Facturer
+                                          </button>
+                                        ) : (
+                                          <span className="read-only-label">Lecture seule</span>
+                                        )}
+                                      </td>
+                                    </tr>
+                                  );
+                                })
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Only keep the "Factures réglées aujourd'hui" section and remove "Factures en attente aujourd'hui" */}
+                    {!invoicesError && (
+                      <div className="factures-section">
+                        <div className="section-header">
+                          <h2>Factures réglées aujourd'hui</h2>
+                          <div className="header-actions">
+                            <button 
+                              className="refresh-button" 
+                              onClick={fetchTodayInvoices}
+                              disabled={isLoadingInvoices}
+                            >
+                              <RefreshIcon />
+                              Actualiser
+                            </button>
+                          </div>
+                        </div>
+                        <div className="factures-table-container">
+                          <table className="factures-table">
+                            <thead>
+                              <tr>
+                                <th>Référence</th>
+                                <th>Patient</th>
+                                <th>Mode de paiement</th>
+                                <th>Montant</th>
+                                <th>Statut</th>
+                                <th>Fichier</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {getFilteredInvoices('payé').length === 0 ? (
+                                <tr>
+                                  <td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>
+                                    Aucune facture réglée aujourd'hui
+                                  </td>
+                                </tr>
+                              ) : (
+                                getFilteredInvoices('payé').map((invoice) => {
+                                  // Handle different field naming conventions
+                                  const id = invoice.id_facture || invoice.idFacture || invoice.id;
+                                  const patientFirstName = invoice.prenomPatient || invoice.prenom_patient || "";
+                                  const patientLastName = invoice.nomPatient || invoice.nom_patient || "";
+                                  const paymentMode = invoice.mode_paiement || invoice.modePaiement || "-";
+                                  const amount = invoice.montant || 0;
+                                  const url = invoice.url || invoice.pdfUrl;
+                                  const patientIPP = invoice.ipp || invoice.idPatient || "";
+                                  
+                                  return (
+                                    <tr key={id}>
+                                      <td>{`FAC-${id}`}</td>
+                                      <td>
+                                        <span className="text-black font-medium">
+                                          {patientFirstName} {patientLastName}
+                                        </span>
+                                      </td>
+                                      <td>{paymentMode}</td>
+                                      <td>{amount ? `${amount} MAD` : '-'}</td>
+                                      <td>Payé</td>
+                                      <td>
+                                        {url ? (
+                                          <button 
+                                            className="view-invoice-button"
+                                            onClick={() => window.open(url, '_blank')}
+                                            title="Voir la facture"
+                                          >
+                                            Voir PDF
+                                          </button>
+                                        ) : (
+                                          'Non disponible'
+                                        )}
+                                      </td>
+                                    </tr>
+                                  );
+                                })
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* Start Visit form for MedecinDashboard */}
+      <StartVisitForm
+        isOpen={showStartVisitForm}
+        onClose={() => {
+          setShowStartVisitForm(false);
+          setSelectedVisit(undefined);
+        }}
+        patientIPP={selectedPatientIPP}
+        onSuccess={() => {
+          // We no longer need to track converted appointments locally
+          // Just refresh the active visits and upcoming visits lists
+          setShowStartVisitForm(false);
+          setSelectedVisit(undefined);
+          
+          // Increment active visits count
+          setActiveVisitsCount(prev => prev + 1);
+          
+          // Refresh both lists
+          fetchActiveVisits();
+          fetchUpcomingVisits();
+        }}
+        selectedVisit={selectedVisit}
+      />
+      
+      {/* Edit Appointment form for MedecinDashboard */}
+      <EditAppointmentForm
+        isOpen={showEditAppointmentForm}
+        onClose={() => {
+          setShowEditAppointmentForm(false);
+          setAppointmentToEdit(null);
+        }}
+        appointment={appointmentToEdit}
+        onSuccess={() => {
+          // Close the form and refresh the appointments
+          setShowEditAppointmentForm(false);
+          setAppointmentToEdit(null);
+          fetchUpcomingVisits();
+        }}
+      />
+      
+      {/* Add FacturePanel component */}
+      <FacturePanel 
+        isOpen={isFacturePanelOpen}
+        onClose={() => {
+          setIsFacturePanelOpen(false);
+          setSelectedFacture(null);
+        }}
+        patientId={selectedFacture?.idPatient || ''}
+        patientIPP={selectedFacture?.ipp || selectedFacture?.idPatient || ''}
+        onFactureAdded={() => {
+          fetchPendingFactures();
+          fetchTodayInvoices();
+        }}
+      />
+      
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && appointmentToEdit && (
+        <>
+          <div className="overlay visible" onClick={() => setShowDeleteConfirm(false)} />
+          <div className="delete-confirmation-modal">
+            <div className="delete-confirmation-header">
+              <h3>Confirmation de suppression</h3>
+            </div>
+            <div className="delete-confirmation-content">
+              <p>Êtes-vous sûr de vouloir supprimer ce rendez-vous ?</p>
+              <p>Cette action est irréversible.</p>
+            </div>
+            <div className="delete-confirmation-actions">
+              <button 
+                className="cancel-btn" 
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                Annuler
+              </button>
+              <button 
+                className="delete-btn" 
+                onClick={async () => {
+                  try {
+                    // Convert Visit to Appointment to get the ID
+                    const appointmentData = convertVisitToAppointment(appointmentToEdit);
+                    if (!appointmentData?.id) {
+                      console.error('No appointment ID found for deletion');
+                      return;
+                    }
+                    
+                    // Call the permanent delete appointment API
+                    await axios.delete(`${API_ENDPOINTS.PERMANENT_DELETE_APPOINTMENT}/${appointmentData.id}`);
+                    
+                    console.log('Appointment deleted successfully');
+                    setShowDeleteConfirm(false);
+                    setAppointmentToEdit(null);
+                    fetchUpcomingVisits();
+                  } catch (error) {
+                    console.error('Error deleting appointment:', error);
+                  }
+                }}
+              >
+                Confirmer
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+const MedecinDashboard = ({ readOnly = false }: { readOnly?: boolean } = {}) => {
+  // Add style element to apply doctor-specific styles
+  useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.innerHTML = doctorTableStyles;
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
+
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Patient[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [activeVisits, setActiveVisits] = useState<Visit[]>([]);
+  const [activeVisitsCount, setActiveVisitsCount] = useState(0);
+  const [completedVisits, setCompletedVisits] = useState<Visit[]>([]);
+  const [completedVisitsCount, setCompletedVisitsCount] = useState(0);
+  const [upcomingVisits, setUpcomingVisits] = useState<Visit[]>([]);
+  const [upcomingVisitsCount, setUpcomingVisitsCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUpcomingLoading, setIsUpcomingLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [upcomingError, setUpcomingError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [showStartVisitForm, setShowStartVisitForm] = useState(false);
+  const [selectedPatientIPP, setSelectedPatientIPP] = useState<string>('');
+  const [selectedVisit, setSelectedVisit] = useState<Visit | undefined>(undefined);
+  // Add state for filtering appointments
+  const [upcomingVisitsSearchTerm, setUpcomingVisitsSearchTerm] = useState<string>('');
+  // Add state for tracking active menu
+  const [openMenuAppointmentId, setOpenMenuAppointmentId] = useState<number | null>(null);
+  // Add state for edit appointment form
+  const [showEditAppointmentForm, setShowEditAppointmentForm] = useState(false);
+  const [appointmentToEdit, setAppointmentToEdit] = useState<Visit | null>(null);
+  
+  // Add state for invoices
+  const [todayInvoices, setTodayInvoices] = useState<any[]>([]);
+  const [pendingFactures, setPendingFactures] = useState<any[]>([]);
+  const [isLoadingInvoices, setIsLoadingInvoices] = useState(false);
+  const [isLoadingPendingFactures, setIsLoadingPendingFactures] = useState(false);
+  const [invoicesError, setInvoicesError] = useState<string | null>(null);
+  const [pendingFacturesError, setPendingFacturesError] = useState<string | null>(null);
+  const [isFacturePanelOpen, setIsFacturePanelOpen] = useState(false);
+  const [selectedFacture, setSelectedFacture] = useState<any>(null);
+  
+  const searchInputRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const actionMenuRef = useRef<HTMLDivElement>(null);
+  
+  // Close search and user menu when clicking outside
+  useEffect(() => {
+    // Use a variable to track if navigation is in progress
+    let isNavigating = false;
+    
+    function handleClickOutside(event: MouseEvent) {
+      // Skip this handler if navigation is in progress
+      if (isNavigating) return;
+      
+      if (searchInputRef.current && 
+          !searchInputRef.current.contains(event.target as Node) &&
+          !(event.target as Element).closest('.search-button') &&
+          !(event.target as Element).closest('.patient-item')) {
+        setShowSearch(false);
+      }
+      
+      if (userMenuRef.current && 
+          !userMenuRef.current.contains(event.target as Node) &&
+          !(event.target as Element).closest('.user-button')) {
+        setShowUserMenu(false);
+      }
+      
+      // Close action menu when clicking outside
+      if (!(event.target as Element).closest('.action-menu-button') && 
+          !(event.target as Element).closest('.action-menu-popup')) {
+        setOpenMenuAppointmentId(null);
+      }
+    }
+    
+    // Listen for navigation events from React Router
+    window.addEventListener('popstate', () => {
+      isNavigating = true;
+      // Reset after navigation
+      setTimeout(() => {
+        isNavigating = false;
+      }, 100);
+    });
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('popstate', () => {});
+    };
+  }, []);
+  
+  // Focus input when search is shown and update debug info
+  useEffect(() => {
+    console.log('Search panel visibility changed:', showSearch);
+    
+    if (showSearch && searchInputRef.current) {
+      const input = searchInputRef.current.querySelector('input');
+      if (input) {
+        console.log('Focusing search input');
+        input.focus();
+      }
+    }
+  }, [showSearch]);
+  
+  // Fetch active and completed visits on load and set up periodic refresh
+  useEffect(() => {
+    // Initial fetch
+    fetchActiveVisits();
+    fetchCompletedVisits();
+    fetchUpcomingVisits();
+    
+    // Auto-refresh has been removed as requested
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  
+  const fetchActiveVisits = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Get the current doctor's ID
+      const doctorId = getDoctorId(user);
+      console.log("Doctor Dashboard: Fetching active visits for doctor ID:", doctorId);
+      
+      if (!doctorId) {
+        console.warn("Doctor ID not available");
+        setActiveVisits([]);
+        setActiveVisitsCount(0);
+        setIsLoading(false);
+        return;
+      }
+      
+      // First try using the doctor-specific endpoint
+      console.log(`Using doctor-specific endpoint: ${API_ENDPOINTS.VISITS.GET_MEDECIN_ACTIVE(doctorId)}`);
+      
+      try {
+        const response = await axios.get(API_ENDPOINTS.VISITS.GET_MEDECIN_ACTIVE(doctorId));
+        console.log("Doctor's active visits raw response:", response.data);
+        
+        let visitsData: Visit[] = [];
+        
+        if (response.data?.visites) {
+          visitsData = response.data.visites;
+        } else if (Array.isArray(response.data)) {
+          visitsData = response.data;
+        }
+        
+        console.log("Parsed visits data:", visitsData);
+        console.log("Visits data length:", visitsData.length);
+        
+        if (visitsData.length > 0) {
+          // Log all visit statuses to debug
+          visitsData.forEach((visit, index) => {
+            console.log(`Visit #${index + 1} - ID: ${visit.idVisite}, Status: ${visit.statut}`);
+            if (visit.patient) {
+              console.log(`  Patient: ${visit.patient.prenom} ${visit.patient.nom}`);
+            }
+            if (visit.medecin) {
+              console.log(`  Doctor: ${visit.medecin.prenom} ${visit.medecin.nom}`);
+            }
+          });
+          
+          // Try a more inclusive approach - consider all active-like statuses
+          // And use client-side filtering to identify the doctor's visits if needed
+          const possibleActiveStatuses = ['EN_COURS', 'ACTIVE', 'IN_PROGRESS', 'STARTED', 'ONGOING'];
+          
+          // More inclusive filter - any status that could mean "active"
+          const activeVisitsForDoctor = visitsData.filter(visit => {
+            const statusMatches = visit.statut ? possibleActiveStatuses.some(status => 
+              visit.statut?.toUpperCase() === status) : false;
+            
+            const visitMedecinId = visit.medecin?.idMedecin || visit.idMedecin;
+            const doctorMatches = visitMedecinId === doctorId;
+            
+            return statusMatches && doctorMatches;
+          });
+          
+          console.log(`Found ${activeVisitsForDoctor.length} active visits matching possible statuses for doctor ${doctorId}`);
+          
+          // Take only the first visit if there are multiple (there should only be one)
+          if (activeVisitsForDoctor.length > 0) {
+            const currentPatient = [activeVisitsForDoctor[0]];
+            console.log("Current patient active visit:", currentPatient[0]);
+            setActiveVisits(currentPatient);
+            setActiveVisitsCount(1);
+            setIsLoading(false);
+            return;
+          }
+        }
+        
+        // If no visits found via doctor endpoint, try the general endpoint as fallback
+        console.log("No active visits found with doctor endpoint, trying general active visits endpoint");
+      } catch (error) {
+        console.error("Error with doctor-specific endpoint:", error);
+        console.log("Falling back to general active visits endpoint");
+      }
+      
+      // Fallback to general endpoint
+      const generalResponse = await axios.get(API_ENDPOINTS.VISITS.GET_ALL_ACTIVE);
+      console.log("General active visits response:", generalResponse.data);
+      
+      let allActiveVisits: Visit[] = [];
+      
+      if (generalResponse.data?.visites) {
+        allActiveVisits = generalResponse.data.visites;
+      } else if (Array.isArray(generalResponse.data)) {
+        allActiveVisits = generalResponse.data;
+      }
+      
+      console.log("All active visits (unfiltered):", allActiveVisits.length);
+      
+      // Filter for this doctor manually
+      const filteredVisits = allActiveVisits.filter(visit => {
+        // Check both medecin object and direct ID
+        const visitDoctorId = visit.medecin?.idMedecin || visit.idMedecin;
+        return visitDoctorId === doctorId;
+      });
+      
+      console.log(`Found ${filteredVisits.length} active visits for doctor ${doctorId} from general endpoint`);
+      
+      // Log all available visits for debugging
+      if (filteredVisits.length > 0) {
+        // Take only the first visit
+        const currentPatient = [filteredVisits[0]];
+        console.log("Setting current patient to:", currentPatient[0]);
+        setActiveVisits(currentPatient);
+        setActiveVisitsCount(1);
+      } else {
+        console.log("No active visits found for this doctor");
+        setActiveVisits([]);
+        setActiveVisitsCount(0);
+      }
+    } catch (error) {
+      console.error("Error fetching active visits for doctor:", error);
+      setError('Erreur lors du chargement des visites actives');
+      setActiveVisits([]);
+      setActiveVisitsCount(0);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const fetchCompletedVisits = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Get the current doctor's ID
+      const doctorId = getDoctorId(user);
+      
+      if (!doctorId) {
+        console.warn("Doctor ID not available, cannot fetch doctor-specific completed visits");
+        setCompletedVisits([]);
+        setCompletedVisitsCount(0);
+        setIsLoading(false);
+        return;
+      }
+      
+      // Use the new doctor-specific endpoint for completed visits
+      console.log(`Fetching completed visits for doctor ID: ${doctorId}`);
+      
+      const response = await axios.get<CompletedVisitsResponse>(
+        API_ENDPOINTS.VISITS.GET_MEDECIN_TODAY_COMPLETED(doctorId)
+      );
+      
+      console.log("Doctor's completed visits response:", response.data);
+      
+      if (response.data.visites) {
+        setCompletedVisits(response.data.visites);
+        setCompletedVisitsCount(response.data.count ?? response.data.visites.length);
+      } else {
+        setCompletedVisits([]);
+        setCompletedVisitsCount(0);
+      }
+    } catch (error) {
+      console.error("Error fetching completed visits for doctor:", error);
+      setCompletedVisits([]);
+      setCompletedVisitsCount(0);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Add a utility function to extract doctor ID in the right format
+  const getDoctorId = (user: any): string | null => {
+    console.log("Getting doctor ID from user object:", user);
+    
+    if (!user) return null;
+    
+    // First try the idMedecin that should be added by the backend mapper
+    if (user.idMedecin) {
+      console.log("Found idMedecin in user object:", user.idMedecin);
+      return user.idMedecin.toString();
+    }
+    
+    // If the user object has a nested medecin object, try to use its ID
+    if (user.medecin?.idMedecin) {
+      console.log("Found medecin.idMedecin in user object:", user.medecin.idMedecin);
+      return user.medecin.idMedecin.toString();
+    }
+    
+    // Try other possible ID fields
+    if (user.id) {
+      console.log("Using fallback user.id:", user.id);
+      return user.id.toString();
+    }
+    
+    if (user.idUtilisateur) {
+      console.log("Using fallback user.idUtilisateur:", user.idUtilisateur);
+      return user.idUtilisateur.toString();
+    }
+    
+    // If we can't find a reasonable ID, log all properties to help debug
+    console.log("Could not find doctor ID. All user properties:");
+    Object.keys(user).forEach(key => {
+      console.log(`${key}: ${JSON.stringify(user[key])}`);
+    });
+    
+    return null;
+  };
+
+  const fetchUpcomingVisits = async () => {
+    try {
+      setIsUpcomingLoading(true);
+      setUpcomingError(null);
+      
+      console.log("Fetching upcoming appointments for today");
+      
+      // Get the current doctor's ID from the user context
+      const doctorId = getDoctorId(user);
+      console.log("Retrieved doctor ID for upcoming appointments:", doctorId);
+      
+      if (!doctorId) {
+        console.warn("Doctor ID not available, cannot fetch doctor-specific appointments");
+        setUpcomingVisits([]);
+        setUpcomingVisitsCount(0);
+        setUpcomingError("Erreur d'identification du médecin");
+        setIsUpcomingLoading(false);
+        return;
+      }
+      
+      // Create endpoint URL with doctor ID filter
+      const doctorAppointmentsUrl = `${API_ENDPOINTS.VISITS.GET_UPCOMING_TODAY}?idMedecin=${doctorId}`;
+      console.log("Using doctor-specific appointments URL:", doctorAppointmentsUrl);
+      
+      const response = await axios.get<UpcomingAppointmentsResponse>(doctorAppointmentsUrl);
+      console.log("Doctor-filtered appointments response:", response.data);
+      
+      if (response.data && response.data.appointments) {
+        // Map the appointments to match the Visit interface
+        const appointments = response.data.appointments.map(appointment => {
+          return {
+            idVisite: appointment.idRendezVous ? Number(appointment.idRendezVous) : (appointment.id ? Number(appointment.id) : 0),
+            typeVisite: appointment.typeVisite || appointment.typeVisit || '',
+            dateDebut: appointment.dateDebut || appointment.dateHeure,
+            commentaire: appointment.commentaire || '',
+            note: appointment.note || '',
+            statut: appointment.status || RendezVousStatus.PLANIFIE,
+            service: appointment.service || '',
+            patient: appointment.patient || {
+              idPatient: appointment.idPatient,
+              ipp: '',
+              nom: '',
+              prenom: '',
+              dateNaissance: '',
+              lieuNaissance: '',
+              sexe: '',
+              adresse: '',
+              ville: '',
+              telephone: '',
+              email: '',
+              cin: '',
+              nationalite: '',
+              etatCivil: '',
+              contactUrgencePrenom: '',
+              contactUrgenceRelation: '',
+              contactUrgenceAdresse: '',
+              contactUrgenceTelephone: '',
+              typeAdmission: '',
+              dateAdmission: '',
+              dateCreation: ''
+            },
+            medecin: appointment.medecin
+          } as Visit;
+        });
+        
+        // Filter out appointments with status EN_COURS or COMPLETE
+        const filteredAppointments = appointments.filter(appointment => {
+          return appointment.statut !== RendezVousStatus.EN_COURS && 
+                 appointment.statut !== RendezVousStatus.COMPLETE;
+        });
+        
+        console.log("Filtered appointments for current doctor:", filteredAppointments.length);
+        console.log("Filtered out", appointments.length - filteredAppointments.length, "appointments with status EN_COURS or COMPLETE");
+        
+        setUpcomingVisits(filteredAppointments);
+        setUpcomingVisitsCount(filteredAppointments.length);
+      } else {
+        console.warn("Unexpected response format for upcoming appointments:", response.data);
+        setUpcomingVisits([]);
+        setUpcomingVisitsCount(0);
+      }
+    } catch (error) {
+      console.error("Error fetching doctor's upcoming appointments:", error);
+      setUpcomingVisits([]);
+      setUpcomingVisitsCount(0);
+      setUpcomingError("Erreur lors du chargement des rendez-vous programmés");
+    } finally {
+      setIsUpcomingLoading(false);
+    }
+  };
+  
+  // Handle clicking on a patient (navigate to patient profile)
+  const handlePatientClick = (ipp: string) => {
+    try {
+      if (!ipp) {
+        throw new Error('Invalid patient IPP');
+      }
+      
+      setIsLoading(true);
+      // Use medecin path for doctor dashboard
+      navigate(`/medecin/patient/${ipp}`);
+    } catch {
+      alert('Erreur lors de la navigation vers le profil du patient. Veuillez réessayer.');
+      setIsLoading(false);
+    }
+  };
+  
+  const searchTimeout = useRef<number | null>(null);
+  
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+    
+    if (value.trim().length > 0) {
+      searchTimeout.current = setTimeout(() => {
+        performSearch(value);
+      }, 300);
+    } else {
+      setSearchResults([]);
+    }
+  };
+  
+  const performSearch = async (query: string) => {
+    if (!query.trim()) return;
+    
+    setIsSearching(true);
+    
+    try {
+      const searchUrl = `${API_ENDPOINTS.PATIENTS.SEARCH}?query=${encodeURIComponent(query.trim())}`;
+      
+      // Add user role and ID headers for access control (MEDECIN role)
+      // Use the getDoctorId helper to get the correct doctor ID format
+      const doctorId = getDoctorId(user);
+      const headers = {
+        'X-User-Role': user?.role || '',
+        'X-User-Id': doctorId || user?.id || user?.idUtilisateur || ''
+      };
+      
+      console.log('Searching patients with headers:', headers);
+      
+      const response = await axios.get<PatientSearchResponse>(searchUrl, { headers });
+      
+      // Handle different possible response structures
+      if (response.data.patients) {
+        setSearchResults(response.data.patients);
+      } else if (Array.isArray(response.data)) {
+        setSearchResults(response.data);
+      } else {
+        setSearchResults([]);
+      }
+      
+      // Force the search panel to be active when we have results
+      if (!showSearch) {
+        setShowSearch(true);
+      }
+    } catch (error) {
+      console.error("Error searching patients:", error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+  
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Just prevent form submission, the search is handled by handleSearchChange
+    if (searchQuery.trim()) {
+      performSearch(searchQuery);
+    }
+  };
+  
+  const toggleSearch = () => {
+    const newState = !showSearch;
+    setShowSearch(newState);
+    
+    if (newState) {
+      // When opening search, don't clear previous results if there's already a query
+      if (!searchQuery.trim()) {
+        setSearchResults([]);
+      }
+      
+      // Focus the input after a slight delay to let the animation start
+      setTimeout(() => {
+        if (searchInputRef.current) {
+          const input = searchInputRef.current.querySelector('input');
+          if (input) input.focus();
+        }
+      }, 100);
+    }
+    
+    // Log the action for debugging
+    console.log('Toggle search:', newState ? 'show' : 'hide');
+  };
+  
+  const toggleUserMenu = () => {
+    setShowUserMenu(!showUserMenu);
+  };
+
+  // Check if we're on the patient creation page or edit page
+  const isPatientCreationPage = location.pathname === '/agent/patient/new';
+  const isPatientEditPage = location.pathname.startsWith('/agent/patient/edit/');
+  const showPatientForm = isPatientCreationPage || isPatientEditPage;
+
+  // Additional functions to handle upcoming visits table
+  const calculateAge = (birthDate: string): number => {
+    const birthDateObj = new Date(birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDateObj.getFullYear();
+    const monthDiff = today.getMonth() - birthDateObj.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDateObj.getDate())) {
+      age--;
+    }
+    
+    return age;
+  };
+  
+  const formatVisitTime = (dateString: string) => {
+    if (!dateString) return 'N/A';
+    
+    try {
+      const date = new Date(dateString);
+      
+      // Format the time as HH:MM
+      return date.toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch (e) {
+      console.error("Error formatting visit time:", e);
+      return 'Erreur';
+    }
+  };
+
+  // Track the previous active tab to know when we switch
+  const prevActiveTabRef = useRef<string>(activeTab);
+  
+  // Add effect to refresh upcoming appointments when switching from appointments tab back to dashboard
+  useEffect(() => {
+    const prevTab = prevActiveTabRef.current;
+    
+    // If we're switching from appointments tab to dashboard tab, refresh the upcoming appointments
+    if (prevTab === 'appointments' && activeTab === 'dashboard') {
+      console.log('Switching from appointments to dashboard tab, refreshing upcoming appointments');
+      fetchUpcomingVisits();
+    }
+    
+    // Update the previous tab reference
+    prevActiveTabRef.current = activeTab;
+  }, [activeTab, fetchUpcomingVisits]);
+
+  // Check if we're on the Add Patient page
+  const isAddPatientPage = location.pathname === '/agent/patient/new';
+  
+  // Add a function to fetch today's invoices
+  const fetchTodayInvoices = async () => {
+    try {
+      setIsLoadingInvoices(true);
+      setInvoicesError(null);
+      
+      const response = await axios.get(API_ENDPOINTS.FACTURES.GET_TODAY);
+      // Sort today's invoices by payment date (most recent first)
+      const sortedInvoices = response.data.sort((a: any, b: any) => {
+        const dateA = new Date(a.dateFacturation || a.date_facturation || a.datePaiement || a.date_paiement || a.createdAt || 0);
+        const dateB = new Date(b.dateFacturation || b.date_facturation || b.datePaiement || b.date_paiement || b.createdAt || 0);
+        return dateB.getTime() - dateA.getTime();
+      });
+      setTodayInvoices(sortedInvoices);
+    } catch (error) {
+      console.error("Error fetching today's invoices:", error);
+      setInvoicesError("Erreur lors du chargement des factures du jour");
+      setTodayInvoices([]);
+    } finally {
+      setIsLoadingInvoices(false);
+    }
+  };
+
+  const fetchPendingFactures = async () => {
+    try {
+      setIsLoadingPendingFactures(true);
+      setPendingFacturesError(null);
+      
+      const response = await axios.get(API_ENDPOINTS.FACTURES.GET_PENDING);
+      // Sort pending factures by ID in descending order (highest/most recent ID first)
+      const sortedFactures = response.data.sort((a: any, b: any) => {
+        const idA = Number(a.idFacture || a.id_facture || a.id || 0);
+        const idB = Number(b.idFacture || b.id_facture || b.id || 0);
+        return idB - idA;
+      });
+      setPendingFactures(sortedFactures);
+    } catch (error) {
+      console.error("Error fetching pending factures:", error);
+      setPendingFacturesError("Erreur lors du chargement des factures en attente");
+      setPendingFactures([]);
+    } finally {
+      setIsLoadingPendingFactures(false);
+    }
+  };
+
+  const handleFacturerClick = (facture: any) => {
+    setSelectedFacture(facture);
+    setIsFacturePanelOpen(true);
+  };
+
+  // Helper function to get filtered invoices by status
+  const getFilteredInvoices = (status: 'payé' | 'non payé') => {
+    return todayInvoices.filter((invoice: any) => {
+      const invoiceStatus = (invoice.status || invoice.statut || "").toLowerCase();
+      return invoiceStatus === status;
+    });
+  };
+
+  // Fetch invoices when switching to the factures tab
+  useEffect(() => {
+    if (activeTab === 'factures' && user?.role?.toUpperCase() === 'AGENT') {
+      fetchTodayInvoices();
+      
+      // Fetch pending factures
+      const fetchPendingFacturesAsync = async () => {
+        try {
+          setIsLoadingPendingFactures(true);
+          setPendingFacturesError(null);
+          
+          const response = await axios.get(API_ENDPOINTS.FACTURES.GET_PENDING);
+          // Sort pending factures by ID in descending order (highest/most recent ID first)
+          const sortedFactures = response.data.sort((a: any, b: any) => {
+            const idA = Number(a.idFacture || a.id_facture || a.id || 0);
+            const idB = Number(b.idFacture || b.id_facture || b.id || 0);
+            return idB - idA;
+          });
+          setPendingFactures(sortedFactures);
+        } catch (error) {
+          console.error("Error fetching pending factures:", error);
+          setPendingFacturesError("Erreur lors du chargement des factures en attente");
+          setPendingFactures([]);
+        } finally {
+          setIsLoadingPendingFactures(false);
+        }
+      };
+      fetchPendingFacturesAsync();
+    }
+  }, [activeTab, user?.role]);
+  
+  return (
+    <div className={`medecin-dashboard ${isAddPatientPage ? 'add-patient-page' : ''}`}>
+      {/* 1. Header (Navigation Bar) */}
+      <header className="dashboard-header">
+        <div className="logo">
+          <a href="/dashboard" title="Accueil">
+            <img src="/noBgWhite.png" alt="H-DOC Logo" className="logo-image" />
+          </a>
+        </div>
+        <div className="header-icons">
+          {/* Search container */}
+          <div className={`search-container ${showSearch ? 'active' : ''}`} onClick={() => !showSearch && toggleSearch()}>
+            {/* Search button - hidden when search panel is open */}
+            {!showSearch && (
+              <button 
+                className="icon-button search-button" 
+                aria-label="Recherche"
+                onClick={toggleSearch}
+              >
+                <SearchIcon />
+              </button>
+            )}
+            
+            {/* Search panel - only shown when active */}
+            {showSearch && (
+              <div className="search-panel">
+                <div className="search-panel-content">
+                  <form onSubmit={handleSearchSubmit} className="search-form">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    placeholder="Rechercher des patients..."
+                    className="search-input"
+                    autoFocus={showSearch}
+                  />
+                </form>
+                <button 
+                  className="close-search-btn" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowSearch(false);
+                    setSearchQuery('');
+                  }}
+                  aria-label="Fermer la recherche"
+                >
+                  <CloseIcon />
+                </button>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* New Notes button - Only visible for admin users */}
+          {user?.role?.toUpperCase() === 'ADMIN' && (
+            <button 
+              className="icon-button notes-button" 
+              aria-label="Notes"
+              onClick={() => navigate('/notes')}
+              title="Accéder aux notes"
+            >
+              <NotesIcon />
+            </button>
+          )}
+          
+          {/* User menu */}
+          <div className="user-menu-container">
+            <button 
+              className="icon-button user-button" 
+              aria-label="Profil Utilisateur"
+              onClick={toggleUserMenu}
+            >
+              <CircleUserIcon />
+            </button>
+            
+            {showUserMenu && (
+              <div className="user-menu" ref={userMenuRef}>
+                <div className="user-info">
+                  <p className="user-name">{user?.prenom} {user?.nom}</p>
+                  <p className="user-role">{user?.role}</p>
+                </div>
+                <hr className="menu-divider" />
+                <button className="menu-item logout" onClick={logout}>
+                  Se déconnecter
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Search results - outside of header content but inside header to maintain z-index context */}
+        {(showSearch && (isSearching || searchResults.length > 0 || (searchQuery.length > 0 && !isSearching))) && (
+          <div className="search-results-doc" ref={searchInputRef}>
+            {isSearching ? (
+              <div className="loading-message">
+                <div className="search-spinner"></div>
+                <p>Recherche en cours...</p>
+              </div>
+            ) : searchResults.length > 0 ? (
+              <>
+                <h3>Résultats ({searchResults.length})</h3>
+                <ul className="patient-list">
+                  {searchResults.map(patient => {
+                    // Calculate initials from name
+                    const initials = `${patient.prenom?.[0] || ''}${patient.nom?.[0] || ''}`.toUpperCase();
+                    
+                    // Calculate age from birthdate
+                    const birthDate = patient.dateNaissance ? new Date(patient.dateNaissance) : null;
+                    const age = birthDate ? Math.floor((new Date().getTime() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null;
+                    
+                    // Gender formatted with icon
+                    const gender = patient.sexe?.toUpperCase();
+                    
+                    return (
+                      <li
+                        key={patient.ipp || patient.idPatient}
+                        className="patient-item"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          
+                          if (!patient.ipp) {
+                            // Use console error instead of alert
+                            console.error("Erreur: Identifiant patient manquant");
+                            return;
+                          }
+                          
+                          setShowSearch(false);
+                          // Use proper path based on user role
+                          const path = user?.role?.toUpperCase() === 'MEDECIN' 
+                            ? `/medecin/patient/${patient.ipp}` 
+                            : `/agent/patient/${patient.ipp}`;
+                          navigate(path, { 
+                            state: { patientData: patient }
+                          });
+                        }}
+                      >
+                        <div className="patient-avatar">
+                          {initials}
+                        </div>
+                        <div className="patient-info">
+                          <div className="patient-name-row">
+                            <p className="patient-name">
+                              {patient.prenom || ''} {patient.nom || ''}
+                            </p>
+                            {gender && (
+                              <span className={`patient-sex-label ${gender === 'F' ? 'female' : 'male'}`}>
+                                {gender === 'F' ? '♀ ' : '♂ '}
+                                {gender === 'F' ? 'Femme' : 'Homme'}
+                              </span>
+                            )}
+                          </div>
+                          
+                          <div className="patient-details-second-row">
+                            {age !== null && (
+                              <span className="patient-age">
+                                {age} ans
+                              </span>
+                            )}
+                            {birthDate && (
+                              <>
+                                <span className="patient-info-separator">•</span>
+                                <span className="patient-birth">
+                                  {birthDate.toLocaleDateString('fr-FR')}
+                                </span>
+                              </>
+                            )}
+                            {patient.ipp && (
+                              <>
+                                <span className="patient-info-separator">•</span>
+                                <span className="patient-id">
+                                  IPP: <span className="patient-id-value">{patient.ipp}</span>
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            ) : searchQuery.length > 0 && !isSearching ? (
+              <div className="no-results">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#aaaaaa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  <line x1="8" y1="11" x2="14" y2="11"></line>
+                </svg>
+                <p>Aucun patient trouvé</p>
+                <p className="no-results-hint">Essayez de modifier votre recherche ou vérifiez l'orthographe</p>
+              </div>
+            ) : null}
+          </div>
+        )}
+      </header>
+
+      {/* Add Tab Navigation - hide when on Add Patient page */}
+      {!isAddPatientPage && (
+        <div className="dashboard-tabs">
+          <button 
+            className={`tab-button ${activeTab === 'dashboard' ? 'active' : ''}`}
+            onClick={() => setActiveTab('dashboard')}
+          >
+            Tableau de bord
+          </button>
+          <button 
+            className={`tab-button ${activeTab === 'appointments' ? 'active' : ''}`}
+            onClick={() => setActiveTab('appointments')}
+          >
+            Rendez-vous
+          </button>
+          {(user?.role?.toUpperCase() === 'AGENT' || user?.role?.toUpperCase() === 'ADMIN') && (
+            <button 
+              className={`tab-button ${activeTab === 'factures' ? 'active' : ''}`}
+              onClick={() => setActiveTab('factures')}
+            >
+              Factures
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Conditional Content Rendering */}
+      {showPatientForm ? (
+        isPatientCreationPage ? <PatientCreation /> : <PatientEdit />
+      ) : (
+        <div className={`dashboard-content ${isFacturePanelOpen ? 'facture-panel-open' : ''}`}>
+          {activeTab === 'dashboard' && (
+            <>
+              {/* 2. Main Title Section */}
+              <div className="main-title-section">
+                <div className="title-area">
+                  <HospitalIcon />
+                  <h1>Bienvenue, {user?.prenom ? `Dr. ${user.prenom} ${user.nom || ''}` : 'Docteur'}</h1>
+                </div>
+              </div>
+
+              {/* 3. Dashboard Content Section */}
+              <div className="summary-cards">
+                {/* Completed Visits Card */}
+                <div className="summary-card">
+                  <div className="card-content">
+                    <h2>Visites Terminées</h2>
+                    <p className="subtitle">Aujourd'hui</p>
+                    <p className="value">{completedVisitsCount}</p>
+                  </div>
+                </div>
+
+
+                {/* Upcoming Visits Card */}
+                <div className="summary-card">
+                  <div className="card-content">
+                    <h2>Rendez-vous prévus</h2>
+                    <p className="subtitle">Aujourd'hui</p>
+                    <p className="value">{upcomingVisitsCount}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 4. Active Visits Section */}
+              <div className="active-visits-section">
+                {/* Wrap just the table component in try-catch for more specific error handling */}
+                {(() => {
+                  try {
+                    return (
+                      <ActiveVisitRow
+                        visits={activeVisits || []}
+                        isLoading={isLoading}
+                        onRefresh={fetchActiveVisits}
+                        onPatientClick={handlePatientClick}
+                        error={error}
+                      />
+                    );
+                  } catch (err) {
+                    console.error("Failed to render ActiveVisitRow:", err);
+                    return (
+                      <div className="error-container">
+                        <p>Erreur d'affichage de la visite active</p>
+                        <button className="refresh-button" onClick={fetchActiveVisits}>
+                          Réessayer
+                        </button>
+                      </div>
+                    );
+                  }
+                })()}
+              </div>
+              
+              {/* 5. Upcoming Visits Section */}
+              <div className="upcoming-visits-section">
+                <div className="section-header">
+                  <h2>Rendez-vous prévus aujourd'hui ({upcomingVisitsCount})</h2>
+                  <div className="header-actions">
+                    <input
+                      type="text"
+                      placeholder="Rechercher un patient"
+                      className="filter-input"
+                      value={upcomingVisitsSearchTerm}
+                      onChange={(e) => setUpcomingVisitsSearchTerm(e.target.value)}
+                    />
+                    <button 
+                      className="refresh-button" 
+                      onClick={fetchUpcomingVisits}
+                      disabled={isUpcomingLoading}
+                    >
+                      <RefreshIcon />
+                      Actualiser
+                    </button>
+                  </div>
+                </div>
+                
+                {isUpcomingLoading ? (
+                  <div className="loading-container">
+                    <div className="spinner"></div>
+                    <p>Chargement des rendez-vous...</p>
+                  </div>
+                ) : upcomingError ? (
+                  <div className="error-container">
+                    <p>{upcomingError}</p>
+                    <button className="refresh-button" onClick={fetchUpcomingVisits}>
+                      Réessayer
+                    </button>
+                  </div>
+                ) : upcomingVisits.length === 0 ? (
+                  <div className="empty-state">
+                    <p>Aucun rendez-vous prévu pour aujourd'hui</p>
+                  </div>
+                ) : (
+                  <div className="visits-table-container">
+                    <table className="visits-table">
+                      <thead>
+                        <tr>
+                          <th>Patient</th>
+                          <th>Sexe</th>
+                          <th>Âge</th>
+                          <th>Type de visite</th>
+                          {user?.role?.toUpperCase() !== 'MEDECIN' && <th>Service</th>}
+                          {readOnly ? <th>Médecin</th> : <th>Arrivée</th>}
+                          {readOnly ? <th>Heure d'arrivée</th> : <th>Notes</th>}
+                          {!readOnly && <th></th>}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {upcomingVisits
+                          .filter(visit => upcomingVisitsSearchTerm 
+                            ? visit.patient?.nom?.toLowerCase().includes(upcomingVisitsSearchTerm.toLowerCase()) || 
+                              visit.patient?.prenom?.toLowerCase().includes(upcomingVisitsSearchTerm.toLowerCase()) ||
+                              visit.patient?.ipp?.toLowerCase().includes(upcomingVisitsSearchTerm.toLowerCase())
+                            : true
+                          )
+                          // Sort appointments - regular first, then late
+                          .sort((a, b) => {
+                            // First sort by status (PLANIFIE first, LATE last)
+                            if (a.statut === RendezVousStatus.LATE && b.statut !== RendezVousStatus.LATE) return 1;
+                            if (a.statut !== RendezVousStatus.LATE && b.statut === RendezVousStatus.LATE) return -1;
+                            
+                            // Then sort by time
+                            return new Date(a.dateDebut).getTime() - new Date(b.dateDebut).getTime();
+                          })
+                          .map(visit => (
+                            <tr key={visit.idVisite} className={visit.statut === RendezVousStatus.LATE ? 'late-appointment' : ''}>
+                              <td 
+                                className="patient-name-cell" 
+                                onClick={() => visit.patient?.ipp && handlePatientClick(visit.patient.ipp)}
+                                style={{ color: '#2c62e8', cursor: 'pointer', fontWeight: 600 }}
+                              >
+                                {visit.patient?.prenom} {visit.patient?.nom}
+                                {visit.fromAppointment && (
+                                  <span className="visit-badge" title="Visite démarrée à partir d'un rendez-vous">RDV</span>
+                                )}
+                                {visit.statut === RendezVousStatus.LATE && (
+                                  <span className="late-badge" title="Patient en retard">Retard</span>
+                                )}
+                              </td>
+                              <td>{visit.patient?.sexe === 'M' ? 'M' : 'F'}</td>
+                              <td>{visit.patient?.dateNaissance ? calculateAge(visit.patient.dateNaissance) : 'N/A'}</td>
+                              <td>{visit.typeVisite || '-'}</td>
+                              {user?.role?.toUpperCase() !== 'MEDECIN' && <td>{visit.service || '-'}</td>}
+                              <td className="visit-time">
+                                {formatVisitTime(visit.dateDebut)}
+                              </td>
+                              {readOnly ? <td>{visit.medecin ? `Dr. ${visit.medecin.prenom} ${visit.medecin.nom}` : '-'}</td> : <td className="visit-notes">
+                                {visit.note || visit.commentaire || '-'}
+                              </td>}
+                              {readOnly ? <td>{visit.medecin ? `Dr. ${visit.medecin.prenom} ${visit.medecin.nom}` : '-'}</td> : <td className="edit-cell">
+                                {/* For medecin role, hide the edit button */}
+                                {!readOnly && user?.role?.toUpperCase() !== 'MEDECIN' && (
+                                  <div className="edit-button-container">
+                                    <button
+                                      className="edit-appointment-button action-button"
+                                      onClick={() => {
+                                        setAppointmentToEdit(visit);
+                                        setShowEditAppointmentForm(true);
+                                      }}
+                                      title="Modifier ce rendez-vous"
+                                    >
+                                      <EditIcon />
+                                    </button>
+                                  </div>
+                                )}
+                              </td>}
+                              {readOnly ? <td>{visit.medecin ? `Dr. ${visit.medecin.prenom} ${visit.medecin.nom}` : '-'}</td> : <td className="start-cell">
+                                {/* For medecin role, hide the start visit button */}
+                                {!readOnly && user?.role?.toUpperCase() !== 'MEDECIN' ? (
+                                  <div className="start-button-container">
+                                    <button
+                                      className="start-visit-button action-button"
+                                      onClick={() => {
+                                        setSelectedPatientIPP(visit.patient?.ipp || '');
+                                        setSelectedVisit(visit);
+                                        setShowStartVisitForm(true);
+                                      }}
+                                      title="Démarrer une visite pour ce patient"
+                                    >
+                                      Démarrer la visite
+                                    </button>
+                                  </div>
+                                ) : readOnly ? (
+                                  <span className="read-only-label">Lecture seule</span>
+                                ) : (
+                                  <span></span> /* Empty for medecin role */
+                                )}
+                              </td>}
+                              {!readOnly && <td className="edit-cell">
+                                {/* For medecin role, hide the edit button */}
+                                {!readOnly && user?.role?.toUpperCase() !== 'MEDECIN' && (
+                                  <div className="edit-button-container">
+                                    <button
+                                      className="edit-appointment-button action-button"
+                                      onClick={() => {
+                                        setAppointmentToEdit(visit);
+                                        setShowEditAppointmentForm(true);
+                                      }}
+                                      title="Modifier ce rendez-vous"
+                                    >
+                                      <EditIcon />
+                                    </button>
+                                  </div>
+                                )}
+                              </td>}
+                              {!readOnly && <td className="start-cell">
+                                {/* For medecin role, hide the start visit button */}
+                                {!readOnly && user?.role?.toUpperCase() !== 'MEDECIN' ? (
+                                  <div className="start-button-container">
+                                    <button
+                                      className="start-visit-button action-button"
+                                      onClick={() => {
+                                        setSelectedPatientIPP(visit.patient?.ipp || '');
+                                        setSelectedVisit(visit);
+                                        setShowStartVisitForm(true);
+                                      }}
+                                      title="Démarrer une visite pour ce patient"
+                                    >
+                                      Démarrer la visite
+                                    </button>
+                                  </div>
+                                ) : readOnly ? (
+                                  <span className="read-only-label">Lecture seule</span>
+                                ) : (
+                                  <span></span> /* Empty for medecin role */
+                                )}
+                              </td>}
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+          
+          {activeTab === 'appointments' && (
+            <AppointmentsCalendar userRole="MEDECIN" userId={getDoctorId(user) || undefined} />
+          )}
+          
+          {activeTab === 'factures' && (user?.role?.toUpperCase() === 'AGENT' || user?.role?.toUpperCase() === 'ADMIN') && (
+            <div className="factures-container">
+              <div className="main-title-section">
+                <div className="title-area">
+                  <ReceiptIcon />
+                  <h1>Factures</h1>
+                </div>
+              </div>
+              
+              <div className="factures-content">
+                {/* Loading state is shared for simplicity */}
+                {isLoadingInvoices || isLoadingPendingFactures ? (
+                  <div className="loading-container">
+                    <div className="spinner"></div>
+                    <p>Chargement des factures...</p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Dedicated Pending Factures Section */}
+                    <div className="factures-section">
+                      <div className="section-header">
+                        <h2>Factures en attente</h2>
+                        <div className="header-actions">
+                          <button 
+                            className="refresh-button" 
+                            onClick={() => {
+                              const fetchPendingFacturesAsync = async () => {
+                                try {
+                                  setIsLoadingPendingFactures(true);
+                                  setPendingFacturesError(null);
+                                  
+                                  const response = await axios.get(API_ENDPOINTS.FACTURES.GET_PENDING);
+                                  // Sort pending factures by ID in descending order (highest/most recent ID first)
+                                  const sortedFactures = response.data.sort((a: any, b: any) => {
+                                    const idA = Number(a.idFacture || a.id_facture || a.id || 0);
+                                    const idB = Number(b.idFacture || b.id_facture || b.id || 0);
+                                    return idB - idA;
+                                  });
+                                  setPendingFactures(sortedFactures);
+                                } catch (error) {
+                                  console.error("Error fetching pending factures:", error);
+                                  setPendingFacturesError("Erreur lors du chargement des factures en attente");
+                                  setPendingFactures([]);
+                                } finally {
+                                  setIsLoadingPendingFactures(false);
+                                }
+                              };
+                              fetchPendingFacturesAsync();
+                            }}
+                            disabled={isLoadingPendingFactures}
+                          >
+                            <RefreshIcon />
+                            Actualiser
+                          </button>
+                        </div>
+                      </div>
+                      
+                      {pendingFacturesError ? (
+                        <div className="error-container">
+                          <p>{pendingFacturesError}</p>
+                          <button className="refresh-button" onClick={() => {
+                            const fetchPendingFacturesAsync = async () => {
+                              try {
+                                setIsLoadingPendingFactures(true);
+                                setPendingFacturesError(null);
+                                
+                                const response = await axios.get(API_ENDPOINTS.FACTURES.GET_PENDING);
+                                // Sort pending factures by ID in descending order (highest/most recent ID first)
+                                const sortedFactures = response.data.sort((a: any, b: any) => {
+                                  const idA = Number(a.idFacture || a.id_facture || a.id || 0);
+                                  const idB = Number(b.idFacture || b.id_facture || b.id || 0);
+                                  return idB - idA;
+                                });
+                                setPendingFactures(sortedFactures);
+                              } catch (error) {
+                                console.error("Error fetching pending factures:", error);
+                                setPendingFacturesError("Erreur lors du chargement des factures en attente");
+                                setPendingFactures([]);
+                              } finally {
+                                setIsLoadingPendingFactures(false);
+                              }
+                            };
+                            fetchPendingFacturesAsync();
+                          }}>
+                            Réessayer
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="factures-table-container">
+                          <table className="factures-table">
+                            <thead>
+                              <tr>
+                                <th>Facture N°</th>
+                                <th>Patient</th>
+                                <th>Statut</th>
+                                {!readOnly && <th></th>}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {pendingFactures.length === 0 ? (
+                                <tr>
+                                  <td colSpan={4} style={{ textAlign: 'center', padding: '20px' }}>
+                                    Aucune facture en attente pour le moment.
+                                  </td>
+                                </tr>
+                              ) : (
+                                pendingFactures.map((facture) => {
+                                  // Extract facture data handling different field conventions
+                                  const id = facture.idFacture || facture.id_facture || facture.id;
+                                  const patientFirstName = facture.prenomPatient || facture.prenom_patient || "";
+                                  const patientLastName = facture.nomPatient || facture.nom_patient || "";
+                                  const patientIPP = facture.idPatient || facture.id_patient || facture.ipp || "";
+                                  const idVisite = facture.idVisite || facture.id_visite || "";
+                                  
+                                  return (
+                                    <tr key={id}>
+                                      <td>{`FCT-${id}`}</td>
+                                      <td>
+                                        <span className="text-black font-medium">
+                                          {patientFirstName} {patientLastName}
+                                        </span>
+                                      </td>
+                                      <td style={{ color: '#e53e3e', fontWeight: 500 }}>non payé</td>
+                                      <td>
+                                        {!readOnly ? (
+                                          <button
+                                            className="start-visit-button action-button"
+                                            onClick={() => handleFacturerClick(facture)}
+                                            title="Traiter cette facture"
+                                          >
+                                            Facturer
+                                          </button>
+                                        ) : (
+                                          <span className="read-only-label">Lecture seule</span>
+                                        )}
+                                      </td>
+                                    </tr>
+                                  );
+                                })
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* Start Visit form for MedecinDashboard */}
+      <StartVisitForm
+        isOpen={showStartVisitForm}
+        onClose={() => {
+          setShowStartVisitForm(false);
+          setSelectedVisit(undefined);
+        }}
+        patientIPP={selectedPatientIPP}
+        onSuccess={() => {
+          // We no longer need to track converted appointments locally
+          // Just refresh the active visits and upcoming visits lists
+          setShowStartVisitForm(false);
+          setSelectedVisit(undefined);
+          
+          // Increment active visits count
+          setActiveVisitsCount(prev => prev + 1);
+          
+          // Refresh both lists
+          fetchActiveVisits();
+          fetchUpcomingVisits();
+        }}
+        selectedVisit={selectedVisit}
+      />
+      
+      {/* Edit Appointment form for MedecinDashboard */}
+      <EditAppointmentForm
+        isOpen={showEditAppointmentForm}
+        onClose={() => {
+          setShowEditAppointmentForm(false);
+          setAppointmentToEdit(null);
+        }}
+        appointment={appointmentToEdit}
+        onSuccess={() => {
+          // Close the form and refresh the appointments
+          setShowEditAppointmentForm(false);
+          setAppointmentToEdit(null);
+          fetchUpcomingVisits();
+        }}
+      />
+    </div>
+  );
+};
+
+// AdminDashboard Component - Read-only version of AgentDashboard
+const AdminDashboard = () => {
+  return (
+    <>
+      <div className="admin-label">Mode Administrateur</div>
+      <AgentDashboard readOnly={true} />
+    </>
+  );
+};
+
+const Dashboard = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation(); // Add location to check current path
+  
+  // Check if we're on the Add Patient page
+  const isAddPatientPage = location.pathname === '/agent/patient/new';
+  
+  // Return early if we can't determine the user role
+  if (!user || !user.role) {
+    return <div>Loading...</div>;
+  }
+  
+  if (user.role.toUpperCase() === 'AGENT') {
+    return <AgentDashboard />;
+  } else if (user.role.toUpperCase() === 'MEDECIN') {
+    return <MedecinDashboard />;
+  } else if (user.role.toUpperCase() === 'ADMIN') {
+    return <AdminDashboard />;
+  } else {
+    logout();
+    return <div>Rôle non reconnu</div>;
+  }
+};
+
+export default Dashboard;

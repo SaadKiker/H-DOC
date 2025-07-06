@@ -1,0 +1,249 @@
+/* VitalSignsBiometrics.css */
+
+/* Validation error styling */
+.validation-error {
+  border-color: #e74c3c !important;
+  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.3) !important;
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+  background-color: #fff8f8 !important;
+}
+
+.field-error-message {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.field-error-message::before {
+  content: '⚠️';
+  margin-right: 4px;
+  font-size: 12px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Biometrics form styles */
+.biometrics-panel {
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  width: 100%;
+  max-width: 800px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  position: relative;
+}
+
+.biometrics-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #1E513B;
+  color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.biometrics-panel-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.biometrics-panel-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.form-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+.form-fields-container {
+  width: 100%;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #fff;
+  flex: 1;
+}
+
+.form-section {
+  margin-bottom: 30px;
+}
+
+.section-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.section-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.section-content {
+  padding: 20px;
+  background-color: white;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #d0d0d0;
+  font-size: 16px;
+  background-color: white;
+}
+
+.required-marker {
+  color: #ff0000;
+  margin-left: 4px;
+  font-weight: 600;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 20px;
+  background-color: #f5f5f5;
+  border-top: 1px solid #eaeaea;
+}
+
+.submit-btn, .cancel-btn {
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  min-width: 100px;
+}
+
+.submit-btn {
+  background-color: #1E513B;
+  color: white;
+}
+
+.submit-btn:hover {
+  background-color: #174430;
+}
+
+.submit-btn:disabled {
+  background-color: #97b1a7;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.cancel-btn:hover {
+  background-color: #e9e9e9;
+}
+
+.error-state {
+  padding: 20px;
+  background-color: #fdf3f2;
+  border: 1px solid #f6d7d2;
+  border-radius: 8px;
+  margin: 20px;
+  text-align: center;
+}
+
+.error-state p {
+  color: #d32f2f;
+  margin-bottom: 10px;
+}
+
+.retry-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+}
+
+.loading-state p {
+  margin-top: 15px;
+  color: #666;
+}
+
+/* Enhanced validation styling for select elements */
+select.validation-error {
+  border-color: #e74c3c !important;
+  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.3) !important;
+  background-color: #fff8f8 !important;
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Select error specific styles */
+.select-error {
+  border-color: #e74c3c !important;
+  background-color: #fff8f8 !important;
+  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.4) !important;
+}
+
+/* Add a placeholder style for empty selects that need validation */
+select.validation-error option:first-child {
+  color: #e74c3c;
+  font-weight: 500;
+}
+
+/* Add a red dropdown arrow for validation errors */
+select.validation-error {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e74c3c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+} 
