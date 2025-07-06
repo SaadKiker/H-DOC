@@ -41,7 +41,17 @@ cd H-DOC
 
 All Supabase connection settings are already pre-configured in the backend's `application.properties`. No additional DB setup is required.
 
-### ✅ 3. Start Backend & DB (Dockerized)
+### ✅ 3. Build Backend Package
+
+Navigate to the backend directory and build the project:
+
+```bash
+cd backend
+./mvnw clean package -DskipTests
+cd ..
+```
+
+### ✅ 4. Start Backend & DB (Dockerized)
 
 This command will:
 - Build backend Docker image
@@ -52,7 +62,7 @@ This command will:
 docker-compose up --build
 ```
 
-### ✅ 4. Run Frontend (Locally in Dev Mode)
+### ✅ 5. Run Frontend (Locally in Dev Mode)
 
 Open a new terminal:
 
@@ -64,10 +74,24 @@ npm run dev
 
 - Frontend runs at: http://localhost:5173
 
-### ✅ 5. Usage
+### ✅ 6. Usage
 
 - **Access full app:** http://localhost:5173
 - **Backend API:** http://localhost:8080
+
+---
+
+## 🔐 Login Credentials
+
+All users have the password: **123**
+
+| Role | Username | Password |
+|------|----------|----------|
+| Agent | agent.asalma | 123 |
+| Admin | admin.bkarim | 123 |
+| Doctor | doctor.[first last name initial][firstname] | 123 |
+
+**Example Doctor Username:** `doctor.ajohn` (for Dr. John Anderson)
 
 ---
 
@@ -79,7 +103,6 @@ npm run dev
 | Frontend | Dev Mode (npm run dev) | http://localhost:5173 |
 | Database | Supabase Cloud | (pre-configured) |
 
----
 
 ## 📂 Project Structure
 
